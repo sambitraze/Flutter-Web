@@ -31,7 +31,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Live Tracking'),
+        title: Text('Live_Tracking'),
         backgroundColor: Colors.cyan,
       ),
       body: HomePage(),
