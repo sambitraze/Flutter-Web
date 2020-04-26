@@ -9,21 +9,42 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int count = 5;
-  
-
+  int count = 2;
   @override
   Widget build(BuildContext context) {
-    if (operatingSystem.name.toString() == 'Linux'){
-      setState(() {
-        count = 6;  
-      });
-    }
     return new Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text(
+          'Live Tracking',
+          style: TextStyle(
+            fontSize: 30.0,
+          ),
+        ),
+        actions: [
+          IconButton(
+              icon: Icon(Icons.tv),
+              onPressed: () {
+                setState(() {
+                  count = 10;
+                });
+              }),
+          IconButton(icon: Icon(Icons.laptop), onPressed: () {
+                setState(() {
+                  count = 5;
+                });
+              }),
+          IconButton(icon: Icon(Icons.android), onPressed: () {
+                setState(() {
+                  count = 2;
+                });
+              }),
+        ],
+        backgroundColor: Colors.cyan,
+      ),
       body: Column(
         children: <Widget>[
           SizedBox(height: 20.0),
-          Text(operatingSystem.name.toString()),
           Text(
             'Line No wise Tracking',
             textAlign: TextAlign.center,
@@ -89,6 +110,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
+          Text(operatingSystem.name.toString()),
         ],
       ),
     );
