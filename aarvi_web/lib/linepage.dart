@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 
 class LinePage extends StatefulWidget {
+  
+  LinePage({this.lineno});
+
+  final String lineno;
+
   @override
   _LinePageState createState() => _LinePageState();
 }
