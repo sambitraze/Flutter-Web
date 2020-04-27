@@ -71,9 +71,7 @@ class _HomePageState extends State<HomePage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => LinePage(
-                                lineno: index.toString(),
-                              ),
+                              builder: (context) => LinePage(lineno: index,),
                             ),
                           );
                         },
