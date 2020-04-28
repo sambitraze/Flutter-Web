@@ -47,21 +47,21 @@ class _LinePageState extends State<LinePage> {
               icon: Icon(Icons.tv),
               onPressed: () {
                 setState(() {
-                  count = 10;
+                  count = 8;
                 });
               }),
           IconButton(
               icon: Icon(Icons.laptop),
               onPressed: () {
                 setState(() {
-                  count = 5;
+                  count = 4;
                 });
               }),
           IconButton(
               icon: Icon(Icons.android),
               onPressed: () {
                 setState(() {
-                  count = 2;
+                  count = 1;
                 });
               }),
         ],
@@ -97,9 +97,6 @@ class _LinePageState extends State<LinePage> {
                         child: MaterialButton(
                           onPressed: () {},
                           color: offline ? Colors.redAccent : working ? Colors.greenAccent : Colors.blueAccent,
-                          // red for offline
-                          // green for online and wroking
-                          //blue for online and completed
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
