@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-//only for debugiing u can delete this file and the button in the app bar in homepage (chip symbol)
 
 class Bro extends StatefulWidget {
   @override

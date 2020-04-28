@@ -11,7 +11,7 @@ class LinePage extends StatefulWidget {
 }
 
 class _LinePageState extends State<LinePage> {
-  int count = 2;
+  int count = 1;
   bool working = true;
   bool offline = true;
 
