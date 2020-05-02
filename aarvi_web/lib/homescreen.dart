@@ -68,7 +68,7 @@ class _HomePageState extends State<HomePage> {
                   if (snapshot.hasData) {
                     List<dynamic> lines =
                         snapshot.data.documents[0].data['lines'];
-                    String documentId = snapshot.data.documents[0].documentID;
+                    String documentId = DateFormat('yyyyMMdd').format(DateTime.now());
                     lines.forEach((element) {
                       print(element);
                     });

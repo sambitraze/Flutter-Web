@@ -1,10 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:aarvi_web/database.dart';
+import 'package:flutter/rendering.dart';
+import 'package:intl/intl.dart';
 import 'package:platform_detect/platform_detect.dart';
 
 class LinePage extends StatefulWidget {
   LinePage({this.lineno});
-  final int lineno;
+
+  int lineno;
 
   @override
   _LinePageState createState() => _LinePageState();
@@ -17,10 +21,10 @@ class _LinePageState extends State<LinePage> {
 
   @override
   Widget build(BuildContext context) {
-
+    Size size = MediaQuery.of(context).size;
     //to dynamically change colour
 
-    // if(intime.hasdata) { 
+    // if(intime.hasdata) {
     //   setState(() {
     //     offline = false;
     //   });
@@ -29,9 +33,8 @@ class _LinePageState extends State<LinePage> {
     //       working = false;
     //     });
     //   }
-      
-    // }
 
+    // }
 
     return Scaffold(
       appBar: AppBar(
@@ -70,68 +73,55 @@ class _LinePageState extends State<LinePage> {
       body: Container(
         child: Column(
           children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-              
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
               Text(
                 'Line no: ' + (widget.lineno.toString()),
                 style: TextStyle(fontSize: 28.0),
               )
             ]),
             Text(DatabaseService().workerCollection.toString()),
-            Expanded(
+            Center(
               child: Padding(
                 padding: const EdgeInsets.all(30.0),
-                child: GridView.count(
-                  mainAxisSpacing: 20,
-                  crossAxisSpacing: 20,
-                  crossAxisCount: count,
-                  children: List.generate(
-                    30,
-                    (index) {
-                      return new Card(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(10.0)),
-                        elevation: 10.0,
-                        child: MaterialButton(
-                          onPressed: () {},
-                          color: offline ? Colors.redAccent : working ? Colors.greenAccent : Colors.blueAccent,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              new Text(
-                                'Worker $index',
-                                style: TextStyle(
-                                  fontSize: 24.0,
-                                ),
-                              ),
-                              SizedBox(height: 10.0),
-                              new Text(
-                                'name $index',
-                                style: TextStyle(
-                                  fontSize: 24.0,
-                                ),
-                              ),
-                              SizedBox(height: 10.0),
-                              new Text(
-                                'operation $index',
-                                style: TextStyle(
-                                  fontSize: 24.0,
-                                ),
-                              ),
-                              SizedBox(height: 10.0),
-                              new Text(
-                                'tot $index',
-                                style: TextStyle(
-                                  fontSize: 24.0,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
+                child: Container(
+                  child: StreamBuilder(
+                    stream: Firestore.instance
+                        .collection('operation')
+                        .document(DateFormat('yyyyMMdd').format(DateTime.now()))
+                        .collection(widget.lineno.toString())
+                        .snapshots(),
+                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot){
+                      if(snapshot.hasData){
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Text("Active"),
+                            Column(
+                              children: snapshot
+                                  .data
+                                  .documents
+                                  .where((element) => element['active'] == true)
+                                  .map((e) =>
+                                  Text(e['name']))
+                                  .toList(),
+                            ),
+                            Text("Not Active"),
+                            Column(
+                              children: snapshot
+                                  .data
+                                  .documents
+                                  .where((element) => element['active'] == false)
+                                  .map((e) => Card(
+                                child: Text(e['name']),))
+                                  .toList(),
+                            )
+                          ],
+                        );
+                      }
+                      else{
+                        return CircularProgressIndicator();
+                      }
+                    } ,
                   ),
                 ),
               ),
