@@ -67,7 +67,7 @@ class _HomePageState extends State<HomePage> {
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.hasData) {
                     List<dynamic> lines =
-                        snapshot.data.documents[0].data['lines'];
+                        snapshot.data.documents.last.data['lines'];
                     String documentId = DateFormat('yyyyMMdd').format(DateTime.now());
                     lines.forEach((element) {
                       print(element);
@@ -104,8 +104,8 @@ Widget customlisttile(BuildContext context, int value, int did,) {
         .snapshots(),
     builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
       if (snapshot.hasData) {
-        print(did);
-        print(value);
+//        print(did);
+//        print(value);
         snapshot.data.documents.forEach((element) {
           print(element.documentID);
         });
