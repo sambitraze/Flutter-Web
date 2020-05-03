@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:aarvi_web/database.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:platform_detect/platform_detect.dart';
@@ -79,7 +78,6 @@ class _LinePageState extends State<LinePage> {
                 style: TextStyle(fontSize: 28.0),
               )
             ]),
-            Text(DatabaseService().workerCollection.toString()),
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(30.0),
