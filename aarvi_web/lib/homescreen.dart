@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:platform_detect/platform_detect.dart';
+import 'package:websafe_platform/websafe_platform.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -11,10 +12,21 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int count = 2;
+  int count = 1;
 
   @override
   Widget build(BuildContext context) {
+     var websafePlatform = WebsafePlatform();
+    if(websafePlatform.isAndroid()){
+      setState(() {
+        count = 2; 
+      });
+    }
+    else{
+      setState(() {
+        count = 5;
+      });
+    }
     return new Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -68,17 +80,22 @@ class _HomePageState extends State<HomePage> {
                   if (snapshot.hasData) {
                     List<dynamic> lines =
                         snapshot.data.documents.last.data['lines'];
-                    String documentId = DateFormat('yyyyMMdd').format(DateTime.now());
+                    String documentId =
+                        DateFormat('yyyyMMdd').format(DateTime.now());
                     lines.forEach((element) {
-                      print(element);
+                      print('line no: '+element.toString());
                     });
                     return GridView.count(
                       crossAxisCount: count,
                       mainAxisSpacing: 20,
                       crossAxisSpacing: 20,
+                      shrinkWrap: true,
                       children: lines
                           .map((e) => customlisttile(
-                              context, e, int.tryParse(documentId),))
+                                context,
+                                e,
+                                int.tryParse(documentId),
+                              ))
                           .toList(),
                     );
                   } else {
@@ -95,7 +112,11 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-Widget customlisttile(BuildContext context, int value, int did,) {
+Widget customlisttile(
+  BuildContext context,
+  int value,
+  int did,
+) {
   return StreamBuilder(
     stream: Firestore.instance
         .collection('operation')
@@ -104,44 +125,45 @@ Widget customlisttile(BuildContext context, int value, int did,) {
         .snapshots(),
     builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
       if (snapshot.hasData) {
-//        print(did);
-//        print(value);
         snapshot.data.documents.forEach((element) {
-          print(element.documentID);
+          print('Doc id:' + element.documentID.toString());
         });
+
         return Card(
           shape: RoundedRectangleBorder(
-              borderRadius: new BorderRadius.circular(10.0)),
+              borderRadius: new BorderRadius.circular(20.0)),
           elevation: 10.0,
           child: MaterialButton(
             onPressed: () {
               Navigator.push(
-                           context,
-                           MaterialPageRoute(
-                             builder: (context) => LinePage(lineno: value,),
-                           ),
-                         );
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LinePage(
+                    lineno: value,
+                  ),
+                ),
+              );
             },
             color: Colors.amberAccent,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 new Text(
-                  'line $value',
+                  'line no $value',
                   style: TextStyle(
                     fontSize: 24.0,
                   ),
                 ),
                 SizedBox(height: 10.0),
                 new Text(
-                  'Online ${snapshot.data.documents.where((element) => element.data['active'] == true).length}',
+                  'Online: ${snapshot.data.documents.where((element) => element.data['active'] == true).length}',
                   style: TextStyle(
                     fontSize: 24.0,
                   ),
                 ),
                 SizedBox(height: 10.0),
                 new Text(
-                  'Offline ${snapshot.data.documents.where((element) => element.data['active'] == false).length}',
+                  'Offline: ${snapshot.data.documents.where((element) => element.data['active'] == false).length}',
                   style: TextStyle(
                     fontSize: 24.0,
                   ),
@@ -156,20 +178,3 @@ Widget customlisttile(BuildContext context, int value, int did,) {
     },
   );
 }
-// Container(
-//                 padding: const EdgeInsets.all(20),
-//                 color: Colors.teal[100],
-//                 child: Column(
-//                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                     children: <Widget>[
-//                       Text('Line 10'),
-//                       Row(
-//                         mainAxisAlignment: MainAxisAlignment.center,
-//                         children: [
-//                           Text('Total operators: '),
-//                           SizedBox(width: 10.0),
-//                           Text('no'),
-//                         ],
-//                       )
-//                     ]),
-//               ),
