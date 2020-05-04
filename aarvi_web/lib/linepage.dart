@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:platform_detect/platform_detect.dart';
-import 'package:websafe_platform/websafe_platform.dart';
 class LinePage extends StatefulWidget {
   LinePage({this.lineno});
 
@@ -17,17 +16,6 @@ class _LinePageState extends State<LinePage> {
   int count = 1;
   @override
   Widget build(BuildContext context) {
-    var websafePlatform = WebsafePlatform();
-    if(websafePlatform.isAndroid()){
-      setState(() {
-        count = 2; 
-      });
-    }
-    else{
-      setState(() {
-        count = 4;
-      });
-    }
     return Scaffold(
       
       appBar: AppBar(
