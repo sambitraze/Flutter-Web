@@ -32,6 +32,7 @@ dependencies:
   platform_detect: ^1.4.0
   cloud_firestore:
   intl:
+  websafe_platform: ^1.0.2
 
 dev_dependencies:
   flutter_test:
