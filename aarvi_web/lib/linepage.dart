@@ -163,7 +163,9 @@ Widget customlisttile(DocumentSnapshot e) {
             'Time In: ' + DateFormat.Hms().format(e['time_in'].toDate()),
             style: TextStyle(fontSize: 24.0),
           ),
-          Text(
+          e['time_out'] == null
+          ? SizedBox(height: 10,)
+          : Text(
             'Time Out: ' + DateFormat.Hms().format(e['time_out'].toDate()),
             style: TextStyle(fontSize: 24.0),
           ),
