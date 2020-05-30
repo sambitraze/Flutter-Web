@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:platform_detect/platform_detect.dart';
-import 'package:websafe_platform/websafe_platform.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -12,21 +11,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int count = 1;
+  int count = 2;
 
   @override
   Widget build(BuildContext context) {
-     var websafePlatform = WebsafePlatform();
-    if(websafePlatform.isAndroid()){
-      setState(() {
-        count = 2; 
-      });
-    }
-    else{
-      setState(() {
-        count = 5;
-      });
-    }
     return new Scaffold(
       appBar: AppBar(
         centerTitle: true,
