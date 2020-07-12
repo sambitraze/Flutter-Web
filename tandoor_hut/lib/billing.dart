@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:slide_digital_clock/slide_digital_clock.dart';
 
 class Billing extends StatefulWidget {
   @override
@@ -32,17 +33,36 @@ class _BillingState extends State<Billing> {
             Container(
               alignment: Alignment.topLeft,
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Bill ',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 42,
-                      fontWeight: FontWeight.bold,
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                    color: Colors.black38,
                     ),
-                    textAlign: TextAlign.left,
+                    padding: EdgeInsets.all(8),
+                    child: Text(
+                      'Bill ',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 42,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.left,
+                    ),
                   ),
-                  Container()
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                    color: Colors.black38,
+                    ),
+                    padding: EdgeInsets.all(12),
+                    child: DigitalClock(
+                      areaDecoration: BoxDecoration(
+                        color: Colors.transparent
+                      ),
+                    ),
+                  )
                 ],
               ),
             ),

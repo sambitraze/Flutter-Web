@@ -1,4 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:slide_digital_clock/slide_digital_clock.dart';
+import 'package:uuid/uuid.dart';
+
+final menuItemColRef = Firestore.instance.collection('MenuItems');
 
 class ManageMenu extends StatefulWidget {
   @override
@@ -6,6 +11,13 @@ class ManageMenu extends StatefulWidget {
 }
 
 class _ManageMenuState extends State<ManageMenu> {
+  bool isveg;
+  TextEditingController itemName = TextEditingController();
+  TextEditingController price = TextEditingController();
+  String type;
+  String id;
+  bool loading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,17 +44,34 @@ class _ManageMenuState extends State<ManageMenu> {
             Container(
               alignment: Alignment.topLeft,
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Manage\nMenu',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 42,
-                      fontWeight: FontWeight.bold,
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: Colors.black38,
                     ),
-                    textAlign: TextAlign.left,
+                    padding: EdgeInsets.all(12),
+                    child: Text(
+                      'Manage\nMenu',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 42,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.left,
+                    ),
                   ),
-                  Container()
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: Colors.black38,
+                    ),
+                    padding: EdgeInsets.all(12),
+                    child: DigitalClock(
+                      areaDecoration: BoxDecoration(color: Colors.transparent),
+                    ),
+                  )
                 ],
               ),
             ),
@@ -83,6 +112,7 @@ class _ManageMenuState extends State<ManageMenu> {
                                   width: 250,
                                   alignment: Alignment.center,
                                   child: TextFormField(
+                                    controller: itemName,
                                     decoration: InputDecoration(
                                       focusColor: Colors.white,
                                       fillColor: Colors.white,
@@ -105,21 +135,55 @@ class _ManageMenuState extends State<ManageMenu> {
                                   decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(15)),
-                                  padding: EdgeInsets.all(8),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 8),
                                   width: 200,
                                   alignment: Alignment.center,
                                   child: DropdownButton(
+                                    value: type,
                                     focusColor: Colors.white,
                                     hint: Text('Menu Type'),
                                     items: [
                                       DropdownMenuItem(
-                                        child: Text('Starters'),
+                                        child: Text('Tandoor'),
+                                        value: 'Tandoor',
                                       ),
                                       DropdownMenuItem(
-                                        child: Text('UPI'),
+                                        child: Text('Main Course'),
+                                        value: 'Main Course',
+                                      ),
+                                      DropdownMenuItem(
+                                        child: Text('Chinese Main Course'),
+                                        value: 'Chinese Main Course',
+                                      ),
+                                      DropdownMenuItem(
+                                        child: Text('Rice/Biryani'),
+                                        value: 'Rice/Biryani',
+                                      ),
+                                      DropdownMenuItem(
+                                        child: Text('Noodles'),
+                                        value: 'Noodles',
+                                      ),
+                                      DropdownMenuItem(
+                                        child: Text('Rolls and Momos'),
+                                        value: 'Rolls and Momos',
+                                      ),
+                                      DropdownMenuItem(
+                                        child: Text('Salads & Raita'),
+                                        value: 'Salads & Raita',
+                                      ),
+                                      DropdownMenuItem(
+                                        child: Text('Breads'),
+                                        value: 'Breads',
                                       ),
                                     ],
-                                    onChanged: (value) => print(value),
+                                    onChanged: (value) {
+                                      if (this.mounted) {
+                                        setState(() {
+                                          type = value.toString();
+                                        });
+                                      }
+                                    },
                                   ),
                                 ),
                                 Container(
@@ -131,16 +195,25 @@ class _ManageMenuState extends State<ManageMenu> {
                                   alignment: Alignment.center,
                                   child: DropdownButton(
                                     focusColor: Colors.white,
-                                    hint: Text('v/nv'),
+                                    value: isveg,
+                                    hint: Text('Veg/Non Veg'),
                                     items: [
                                       DropdownMenuItem(
                                         child: Text('Veg'),
+                                        value: true,
                                       ),
                                       DropdownMenuItem(
                                         child: Text('Non-Veg'),
+                                        value: false,
                                       ),
                                     ],
-                                    onChanged: (value) => print(value),
+                                    onChanged: (value) {
+                                      if (this.mounted) {
+                                        setState(() {
+                                          isveg = value;
+                                        });
+                                      }
+                                    },
                                   ),
                                 ),
                                 Container(
@@ -148,6 +221,7 @@ class _ManageMenuState extends State<ManageMenu> {
                                   width: 200,
                                   alignment: Alignment.center,
                                   child: TextFormField(
+                                    controller: price,
                                     decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.money_off),
                                       focusColor: Colors.white,
@@ -168,7 +242,27 @@ class _ManageMenuState extends State<ManageMenu> {
                                   ),
                                 ),
                                 MaterialButton(
-                                  onPressed: () => print('sdadaf'),
+                                  onPressed: () {
+                                    setState(() {
+                                      loading = true;
+                                    });
+                                    print('sdadaf');
+                                    id = Uuid().v4();
+                                    print('use ' + id);
+                                    menuItemColRef.document(id).setData({
+                                      'Id': id.toString(),
+                                      'Is_Veg': isveg,
+                                      'Item_Name': itemName.text,
+                                      'Item_Type': type,
+                                      'Price': price.text,
+                                      'Ratting': 5,
+                                      'url': 'google.com'
+                                    }).whenComplete(() {setState(() {
+                                      loading = false;
+                                    });});
+                                    id = Uuid().v4();
+                                    print('new ' + id);
+                                  },
                                   child: Text(
                                     'Add Item',
                                     style: TextStyle(fontSize: 22),
@@ -179,6 +273,7 @@ class _ManageMenuState extends State<ManageMenu> {
                                     borderRadius: BorderRadius.circular(15),
                                   ),
                                 ),
+                                loading?CircularProgressIndicator():Container(),
                                 Icon(Icons.local_dining, size: 100)
                               ],
                             ),
@@ -505,7 +600,7 @@ class _ManageMenuState extends State<ManageMenu> {
                                         alignment: Alignment.center,
                                         color: Colors.orange[400],
                                         child: Text(
-                                          'Rolls na Momos',
+                                          'Rolls and Momos',
                                           style: TextStyle(
                                               fontSize: 26,
                                               fontWeight: FontWeight.bold),
@@ -552,7 +647,7 @@ class _ManageMenuState extends State<ManageMenu> {
                                         alignment: Alignment.center,
                                         color: Colors.orange[400],
                                         child: Text(
-                                          'Salads & and Raita',
+                                          'Salads & Raita',
                                           style: TextStyle(
                                               fontSize: 26,
                                               fontWeight: FontWeight.bold),

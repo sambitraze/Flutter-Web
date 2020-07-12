@@ -12,9 +12,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 3;
+  int _selectedIndex = 5;
   PageController pageController = PageController(
-    initialPage: 3,
+    initialPage: 5,
     keepPage: true,
   );
 

@@ -31,6 +31,8 @@ dependencies:
   slide_digital_clock: ^1.0.0
   firebase: ^7.3.0
   cloud_firestore: 
+  uuid:
+  dwds: ^5.1.0
 
 dev_dependencies:
   flutter_test:
