@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
 class Billing extends StatefulWidget {
   @override
@@ -32,14 +31,19 @@ class _BillingState extends State<Billing> {
           children: [
             Container(
               alignment: Alignment.topLeft,
-              child: Text(
-                'Bill ',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 42,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.left,
+              child: Row(
+                children: [
+                  Text(
+                    'Bill ',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 42,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.left,
+                  ),
+                  Container()
+                ],
               ),
             ),
             Divider(
@@ -130,7 +134,10 @@ class _BillingState extends State<Billing> {
                         ],
                       ),
                     ),
-                    Container(
+                    Expanded(
+                      child: ListView(
+                        children: [
+                          Container(
                       alignment: Alignment.topCenter,
                       padding: const EdgeInsets.all(50.0),
                       child: Row(
@@ -382,6 +389,9 @@ class _BillingState extends State<Billing> {
                               borderRadius: BorderRadius.circular(15),
                             ),
                           ),
+                        ],
+                      ),
+                    ),
                         ],
                       ),
                     ),

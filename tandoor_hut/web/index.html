@@ -21,6 +21,30 @@
   <!-- This script installs service_worker.js to provide PWA functionality to
        application. For more information, see:
        https://developers.google.com/web/fundamentals/primers/service-workers -->
+  <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-app.js"></script>
+
+  <!-- If you enabled Analytics in your project, add the Firebase SDK for Analytics -->
+  <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-analytics.js"></script>
+     
+  <!-- Add Firebase products that you want to use -->
+  <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-firestore.js"></script>
+  <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyDITPW9I_-uOQOFGLVs7IonHlu8xSd0TvA",
+      authDomain: "restro-b969a.firebaseapp.com",
+      databaseURL: "https://restro-b969a.firebaseio.com",
+      projectId: "restro-b969a",
+      storageBucket: "restro-b969a.appspot.com",
+      messagingSenderId: "741299363754",
+      appId: "1:741299363754:web:377cc84e650c0abc4a15d3",
+      measurementId: "G-LBBGGGJFMF"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+  </script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {

@@ -12,9 +12,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 5;
+  int _selectedIndex = 3;
   PageController pageController = PageController(
-    initialPage: 5,
+    initialPage: 3,
     keepPage: true,
   );
 
@@ -122,6 +122,7 @@ class _HomePageState extends State<HomePage> {
           Expanded(
             child: PageView(
               scrollDirection:Axis.vertical,
+              physics:new NeverScrollableScrollPhysics(),
               children: [
                 DashBoard(),
                 Orders(),
