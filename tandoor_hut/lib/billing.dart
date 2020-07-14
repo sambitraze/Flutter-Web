@@ -17,7 +17,7 @@ class _BillingState extends State<Billing> {
   List itemList = [];
   List srlno = [];
   int srl = 1;
-  List quant =[];
+  List quant = [];
   List priceunit = [];
   List amount = [];
   List<DataRow> rowList = [];
@@ -25,455 +25,534 @@ class _BillingState extends State<Billing> {
   double itemsum = 0;
   double packing = 10;
   double gstper = 0.07;
-  double gstCharge=0.0;
+  double gstCharge = 0.0;
   double grandtot = 0.0;
 
-  additemtotal(double val,double quanti){
-    
+  additemtotal(double val, double quanti) {
     setState(() {
-      itemsum+=val;
-      gstCharge = itemsum*gstper;
-      grandtot = gstCharge+packing+itemsum;
+      itemsum += val;
+      gstCharge = itemsum * gstper;
+      grandtot = gstCharge + packing + itemsum;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(
-              'assets/dashboard.png',
-            ),
-            fit: BoxFit.cover,
-          ),
-        ),
-        height: double.infinity,
-        width: double.infinity,
-        padding: EdgeInsets.only(
-          left: 100,
-          right: 100,
-          top: 50,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              alignment: Alignment.topLeft,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: Colors.black38,
-                    ),
-                    padding: EdgeInsets.all(8),
-                    child: Text(
-                      'Bill ',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 42,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.left,
-                    ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: Colors.black38,
-                    ),
-                    padding: EdgeInsets.all(12),
-                    child: DigitalClock(
-                      areaDecoration: BoxDecoration(color: Colors.transparent),
-                    ),
-                  ),
-                ],
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(
+                  'assets/dashboard.png',
+                ),
+                fit: BoxFit.cover,
               ),
             ),
-            Divider(
-              indent: 05,
-              endIndent: 20,
-              height: 10,
-              thickness: 5,
-              color: Colors.white,
+          ),
+          Container(
+            decoration: BoxDecoration(color: Colors.black38),
+          ),
+          Container(
+            height: double.infinity,
+            width: double.infinity,
+            padding: EdgeInsets.only(
+              left: 100,
+              right: 100,
+              top: 50,
             ),
-            Expanded(
-              child: Card(
-                color: Colors.grey[200],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      height: 210,
-                      width: double.infinity,
-                      color: Color.fromRGBO(206, 206, 206, 1),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(15.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Image.asset(
-                                  'assets/minilogo.png',
-                                  fit: BoxFit.cover,
-                                  height: 100,
-                                ),
-                                Container(
-                                  height: 100,
-                                  width: 400,
-                                  alignment: Alignment.center,
-                                  child: TextFormField(
-                                    controller: itemName,
-                                    decoration: InputDecoration(
-                                      prefixIcon: Icon(Icons.search),
-                                      focusColor: Colors.white,
-                                      fillColor: Colors.white,
-                                      filled: true,
-                                      hintText: 'Search Item',
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(15),
-                                        borderSide: BorderSide(
-                                            color: Colors.white, width: 1.0),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(15),
-                                        borderSide: BorderSide(
-                                            color: Colors.white, width: 2.0),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  height: 100,
-                                  width: 200,
-                                  alignment: Alignment.center,
-                                  child: TextFormField(
-                                    controller: quantity,
-                                    textAlign: TextAlign.center,
-                                    decoration: InputDecoration(
-                                      focusColor: Colors.white,
-                                      fillColor: Colors.white,
-                                      filled: true,
-                                      hintText: 'Qauntity',
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(15),
-                                        borderSide: BorderSide(
-                                            color: Colors.white, width: 1.0),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(15),
-                                        borderSide: BorderSide(
-                                            color: Colors.white, width: 2.0),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                MaterialButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      loading = true;
-                                    });
-                                    menuItemColRef
-                                        .where("Item_Name",
-                                            isEqualTo: itemName.text)
-                                        .getDocuments()
-                                        .then(
-                                      (querySnapshot) {
-                                        querySnapshot.documents.forEach(
-                                          (result) {
-                                            print(result.data);
-                                            srlno.add("1");
-                                            itemList.add(result.data['Item_Name']);
-                                            priceunit.add(result.data['Price']);
-                                            quant.add(quantity.text);
-                                            amount.add((int.parse(quantity.text)*int.parse(result.data['Price'])));
-                                            additemtotal((int.parse(quantity.text)*int.parse(result.data['Price'])).toDouble(),double.parse(quantity.text));
-                                            rowList.add(DataRow(cells: [
-                                              DataCell(Text("1")),
-                                              DataCell(Text(result.data['Item_Name'])),
-                                              DataCell(Text(result.data['Price'])),
-                                              DataCell(Text(quantity.text)),
-                                              DataCell(Text((int.parse(quantity.text)*int.parse(result.data['Price'])).toString())),
-                                            ]));
-                                          },
-                                        );
-                                      },
-                                    ).whenComplete(
-                                      () {
-                                        setState(
-                                          () {
-                                            loading = false;
-                                          },
-                                        );
-                                      },
-                                    );
-                                  },
-                                  child: Text(
-                                    'Search',
-                                    style: TextStyle(fontSize: 22),
-                                  ),
-                                  color: Colors.orange,
-                                  padding: EdgeInsets.all(12),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                ),
-                                loading
-                                    ? CircularProgressIndicator()
-                                    : Container(),
-                                Icon(Icons.receipt, size: 100)
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 30, vertical: 15),
-                            child: Text(
-                              'Near SBI ATM Godhna Road Ara, Bhojpur,\nPhone Number - 9776999273',
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  alignment: Alignment.topLeft,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(8),
+                        width: 175,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Inovice ',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 42,
+                                fontWeight: FontWeight.bold,
+                              ),
                               textAlign: TextAlign.left,
-                              style: TextStyle(fontSize: 18),
                             ),
-                          )
-                        ],
+                            Divider(
+                              color: Colors.white,
+                              thickness: 2,
+                              endIndent: 20,
+                              indent: 10,
+                            )
+                          ],
+                        ),
                       ),
+                      Container(
+                        // decoration: BoxDecoration(
+                        //   borderRadius: BorderRadius.circular(15),
+                        //   color: Colors.black38,
+                        // ),
+                        padding: EdgeInsets.all(12),
+                        child: DigitalClock(
+                          areaDecoration:
+                              BoxDecoration(color: Colors.transparent),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Card(
+                    color: Colors.grey[200],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
                     ),
-                    Expanded(
-                      child: ListView(
-                        children: [
-                          Container(
-                            alignment: Alignment.topCenter,
-                            padding: const EdgeInsets.all(50.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(18),
-                                  ),
-                                  elevation: 5,
-                                  child: Container(
-                                    color: Colors.white,
-                                    child: DataTable(
-                                      columns: <DataColumn>[
-                                        DataColumn(
-                                          label: Text(
-                                            'Srl No',
-                                            style: TextStyle(
-                                                fontStyle: FontStyle.italic),
-                                          ),
-                                        ),
-                                        DataColumn(
-                                          label: Text(
-                                            'Item',
-                                            style: TextStyle(
-                                                fontStyle: FontStyle.italic),
-                                          ),
-                                        ),
-                                        DataColumn(
-                                          label: Text(
-                                            'Price/Unit',
-                                            style: TextStyle(
-                                                fontStyle: FontStyle.italic),
-                                          ),
-                                        ),
-                                        DataColumn(
-                                          label: Text(
-                                            'Quantiy',
-                                            style: TextStyle(
-                                                fontStyle: FontStyle.italic),
-                                          ),
-                                        ),
-                                        DataColumn(
-                                          label: Text(
-                                            'Amount',
-                                            style: TextStyle(
-                                                fontStyle: FontStyle.italic),
-                                          ),
-                                        ),
-                                      ],
-                                      rows: rowList,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          height: 210,
+                          width: double.infinity,
+                          color: Color.fromRGBO(206, 206, 206, 1),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Image.asset(
+                                      'assets/minilogo.png',
+                                      fit: BoxFit.cover,
+                                      height: 100,
                                     ),
-                                  ),
-                                ),
-                                Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(18),
-                                  ),
-                                  elevation: 5,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Container(
-                                        height: 50,
-                                        width: 500,
-                                        alignment: Alignment.center,
-                                        color: Colors.orange[400],
-                                        child: Text(
-                                          'Total Amount',
-                                          style: TextStyle(
-                                              fontSize: 26,
-                                              fontWeight: FontWeight.bold),
+                                    Container(
+                                      height: 100,
+                                      width: 400,
+                                      alignment: Alignment.center,
+                                      child: TextFormField(
+                                        controller: itemName,
+                                        decoration: InputDecoration(
+                                          prefixIcon: Icon(Icons.search),
+                                          focusColor: Colors.white,
+                                          fillColor: Colors.white,
+                                          filled: true,
+                                          hintText: 'Search Item',
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            borderSide: BorderSide(
+                                                color: Colors.white,
+                                                width: 1.0),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            borderSide: BorderSide(
+                                                color: Colors.white,
+                                                width: 2.0),
+                                          ),
                                         ),
                                       ),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
+                                    ),
+                                    Container(
+                                      height: 100,
+                                      width: 200,
+                                      alignment: Alignment.center,
+                                      child: TextFormField(
+                                        controller: quantity,
+                                        textAlign: TextAlign.center,
+                                        decoration: InputDecoration(
+                                          focusColor: Colors.white,
+                                          fillColor: Colors.white,
+                                          filled: true,
+                                          hintText: 'Qauntity',
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            borderSide: BorderSide(
+                                                color: Colors.white,
+                                                width: 1.0),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            borderSide: BorderSide(
+                                                color: Colors.white,
+                                                width: 2.0),
+                                          ),
                                         ),
-                                        height: 300,
-                                        width: 350,
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            ListTile(
-                                              leading: Text('Item Total'),
-                                              trailing: Text('Rs '+itemsum.toString()),
+                                      ),
+                                    ),
+                                    MaterialButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          loading = true;
+                                        });
+                                        menuItemColRef
+                                            .where("Item_Name",
+                                                isEqualTo: itemName.text)
+                                            .getDocuments()
+                                            .then(
+                                          (querySnapshot) {
+                                            querySnapshot.documents.forEach(
+                                              (result) {
+                                                print(result.data);
+                                                srlno.add("1");
+                                                itemList.add(
+                                                    result.data['Item_Name']);
+                                                priceunit
+                                                    .add(result.data['Price']);
+                                                quant.add(quantity.text);
+                                                amount.add((int.parse(
+                                                        quantity.text) *
+                                                    int.parse(
+                                                        result.data['Price'])));
+                                                additemtotal(
+                                                    (int.parse(quantity.text) *
+                                                            int.parse(result
+                                                                .data['Price']))
+                                                        .toDouble(),
+                                                    double.parse(
+                                                        quantity.text));
+                                                rowList.add(DataRow(cells: [
+                                                  DataCell(Text("1")),
+                                                  DataCell(Text(result
+                                                      .data['Item_Name'])),
+                                                  DataCell(Text(
+                                                      result.data['Price'])),
+                                                  DataCell(Text(quantity.text)),
+                                                  DataCell(Text((int.parse(
+                                                              quantity.text) *
+                                                          int.parse(result
+                                                              .data['Price']))
+                                                      .toString())),
+                                                ]));
+                                              },
+                                            );
+                                          },
+                                        ).whenComplete(
+                                          () {
+                                            setState(
+                                              () {
+                                                loading = false;
+                                              },
+                                            );
+                                          },
+                                        );
+                                      },
+                                      child: Text(
+                                        'Add',
+                                        style: TextStyle(fontSize: 22),
+                                      ),
+                                      color: Colors.orange,
+                                      padding: EdgeInsets.all(12),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                    ),
+                                    loading
+                                        ? CircularProgressIndicator()
+                                        : Container(),
+                                    Icon(Icons.receipt, size: 100)
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 30, vertical: 15),
+                                child: Text(
+                                  'Near SBI ATM Godhna Road Ara, Bhojpur,\nPhone Number - 9776999273',
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: ListView(
+                            children: [
+                              Container(
+                                alignment: Alignment.topCenter,
+                                padding: const EdgeInsets.all(50.0),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Card(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(18),
+                                      ),
+                                      elevation: 5,
+                                      child: Container(
+                                        color: Colors.white,
+                                        child: DataTable(
+                                          columns: <DataColumn>[
+                                            DataColumn(
+                                              label: Text(
+                                                'Srl No',
+                                                style: TextStyle(
+                                                    fontStyle: FontStyle.italic,
+                                                    fontSize: 16),
+                                              ),
                                             ),
-                                            ListTile(
-                                              leading: Text('Packing'),
-                                              trailing: Text('Rs '+packing.toString()),
+                                            DataColumn(
+                                              label: Text(
+                                                'Item',
+                                                style: TextStyle(
+                                                    fontStyle: FontStyle.italic,
+                                                    fontSize: 16),
+                                              ),
                                             ),
-                                            ListTile(
-                                              leading: Text('GST @ 7%'),
-                                              trailing: Text('Rs '+gstCharge.toStringAsFixed(2)),
+                                            DataColumn(
+                                              label: Text(
+                                                'Price/Unit',
+                                                style: TextStyle(
+                                                    fontStyle: FontStyle.italic,
+                                                    fontSize: 16),
+                                              ),
                                             ),
-                                            ListTile(
-                                              leading: Text('Grand Total'),
-                                              trailing: Container(
-                                                padding: EdgeInsets.all(8),
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                    color: Colors.green,
-                                                  ),
-                                                ),
-                                                child: Text('Rs '+grandtot.toStringAsFixed(2)),
+                                            DataColumn(
+                                              label: Text(
+                                                'Quantiy',
+                                                style: TextStyle(
+                                                    fontStyle: FontStyle.italic,
+                                                    fontSize: 16),
+                                              ),
+                                            ),
+                                            DataColumn(
+                                              label: Text(
+                                                'Amount',
+                                                style: TextStyle(
+                                                    fontStyle: FontStyle.italic,
+                                                    fontSize: 16),
                                               ),
                                             ),
                                           ],
+                                          rows: rowList,
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          Container(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Container(
-                                  height: 100,
-                                  width: 250,
-                                  alignment: Alignment.center,
-                                  child: TextFormField(
-                                    decoration: InputDecoration(
-                                      prefixIcon: Icon(Icons.person),
-                                      focusColor: Colors.white,
-                                      fillColor: Colors.white,
-                                      filled: true,
-                                      hintText: 'Customer Name',
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(15),
-                                        borderSide: BorderSide(
-                                            color: Colors.white, width: 1.0),
+                                    ),
+                                    Card(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(18),
                                       ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(15),
-                                        borderSide: BorderSide(
-                                            color: Colors.white, width: 2.0),
+                                      elevation: 5,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Container(
+                                            height: 50,
+                                            width: 500,
+                                            alignment: Alignment.center,
+                                            color: Colors.orange[400],
+                                            child: Text(
+                                              'Total Amount',
+                                              style: TextStyle(
+                                                  fontSize: 26,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                            ),
+                                            height: 300,
+                                            width: 350,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                ListTile(
+                                                  leading: Text('Item Total'),
+                                                  trailing: Text('Rs ' +
+                                                      itemsum.toString()),
+                                                ),
+                                                ListTile(
+                                                  leading: Text('Packing'),
+                                                  trailing: Text('Rs ' +
+                                                      packing.toString()),
+                                                ),
+                                                ListTile(
+                                                  leading: Text('GST @ 7%'),
+                                                  trailing: Text('Rs ' +
+                                                      gstCharge
+                                                          .toStringAsFixed(2)),
+                                                ),
+                                                ListTile(
+                                                  leading: Text('Grand Total'),
+                                                  trailing: Container(
+                                                    padding: EdgeInsets.all(8),
+                                                    decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                        color: Colors.green,
+                                                      ),
+                                                    ),
+                                                    child: Text('Rs ' +
+                                                        grandtot
+                                                            .toStringAsFixed(
+                                                                2)),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      height: 100,
+                                      width: 250,
+                                      alignment: Alignment.center,
+                                      child: TextFormField(
+                                        decoration: InputDecoration(
+                                          prefixIcon: Icon(Icons.person),
+                                          focusColor: Colors.white,
+                                          fillColor: Colors.white,
+                                          filled: true,
+                                          hintText: 'Customer Name',
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            borderSide: BorderSide(
+                                                color: Colors.white,
+                                                width: 1.0),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            borderSide: BorderSide(
+                                                color: Colors.white,
+                                                width: 2.0),
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                                Container(
-                                  height: 100,
-                                  width: 250,
-                                  alignment: Alignment.center,
-                                  child: TextFormField(
-                                    decoration: InputDecoration(
-                                      prefixIcon: Icon(Icons.phone),
-                                      focusColor: Colors.white,
-                                      fillColor: Colors.white,
-                                      filled: true,
-                                      hintText: 'Phone Number',
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(15),
-                                        borderSide: BorderSide(
-                                            color: Colors.white, width: 1.0),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(15),
-                                        borderSide: BorderSide(
-                                            color: Colors.white, width: 2.0),
+                                    Container(
+                                      height: 100,
+                                      width: 250,
+                                      alignment: Alignment.center,
+                                      child: TextFormField(
+                                        decoration: InputDecoration(
+                                          prefixIcon: Icon(Icons.phone),
+                                          focusColor: Colors.white,
+                                          fillColor: Colors.white,
+                                          filled: true,
+                                          hintText: 'Phone Number',
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            borderSide: BorderSide(
+                                                color: Colors.white,
+                                                width: 1.0),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            borderSide: BorderSide(
+                                                color: Colors.white,
+                                                width: 2.0),
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(15)),
-                                  padding: EdgeInsets.all(8),
-                                  width: 200,
-                                  alignment: Alignment.center,
-                                  child: DropdownButton(
-                                    focusColor: Colors.white,
-                                    hint: Text('Payemnt Type'),
-                                    items: [
-                                      DropdownMenuItem(
-                                        child: Text('Cash'),
-                                        value: 'Cash',
+                                    Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(15)),
+                                      padding: EdgeInsets.all(8),
+                                      width: 200,
+                                      alignment: Alignment.center,
+                                      child: DropdownButton(
+                                        focusColor: Colors.white,
+                                        hint: Text('Payemnt Type'),
+                                        items: [
+                                          DropdownMenuItem(
+                                            child: Text('Cash'),
+                                            value: 'Cash',
+                                          ),
+                                          DropdownMenuItem(
+                                            child: Text('UPI'),
+                                            value: 'UPI',
+                                          ),
+                                        ],
+                                        onChanged: (value) => print(value),
                                       ),
-                                      DropdownMenuItem(
-                                        child: Text('UPI'),
-                                        value: 'UPI',
+                                    ),
+                                    MaterialButton(
+                                      onPressed: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                                            title: Text('Proccesing'),
+                                            content: Container(
+                                              height: 100,
+                                              width: 100,
+                                              child:
+                                                  Padding(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 12.0,vertical: 35),
+                                                    child: LinearProgressIndicator(
+                                                      
+                                                    ),
+                                                  ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Text(
+                                        'Print Bill',
+                                        style: TextStyle(fontSize: 22),
                                       ),
-                                    ],
-                                    onChanged: (value) => print(value),
-                                  ),
+                                      color: Colors.orange,
+                                      padding: EdgeInsets.all(18),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                MaterialButton(
-                                  onPressed: () => print('s'),
-                                  child: Text(
-                                    'Print Bill',
-                                    style: TextStyle(fontSize: 22),
-                                  ),
-                                  color: Colors.orange,
-                                  padding: EdgeInsets.all(18),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

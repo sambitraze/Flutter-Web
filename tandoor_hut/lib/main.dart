@@ -1,4 +1,6 @@
+import 'package:custom_splash/custom_splash.dart';
 import 'package:flutter/material.dart';
+import 'package:tandoor_hut/login.dart';
 
 import 'homepage.dart';
 
@@ -16,7 +18,16 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: HomePage(),
+      home: CustomSplash(
+        backGroundColor: Colors.black,
+        imagePath: 'assets/logo.png',
+        animationEffect: 'zoom-in',
+        logoSize: 150,
+        duration: 2500,
+        type: CustomSplashType.StaticDuration,
+        // home: LoginPage(),
+        home: HomePage(),
+      ),
     );
   }
 }

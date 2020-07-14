@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tandoor_hut/DeliveryStatus.dart';
 import 'package:tandoor_hut/billing.dart';
 import 'package:tandoor_hut/dashboard.dart';
+import 'package:tandoor_hut/login.dart';
 import 'package:tandoor_hut/managemenu.dart';
 import 'package:tandoor_hut/messages.dart';
 import 'package:tandoor_hut/orders.dart';
@@ -53,6 +55,24 @@ class _HomePageState extends State<HomePage> {
               child: Image.asset(
                 'assets/logo.png',
                 height: 65,
+              ),
+            ),
+            trailing: Padding(
+              padding: EdgeInsets.all(4),
+              child: IconButton(
+                icon: Icon(
+                  Icons.exit_to_app,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  FirebaseAuth.instance.signOut().whenComplete(() {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) => LoginPage(),
+                      ),
+                    );
+                  });
+                },
               ),
             ),
             labelType: NavigationRailLabelType.selected,
@@ -121,8 +141,8 @@ class _HomePageState extends State<HomePage> {
           ),
           Expanded(
             child: PageView(
-              scrollDirection:Axis.vertical,
-              physics:new NeverScrollableScrollPhysics(),
+              scrollDirection: Axis.vertical,
+              physics: new NeverScrollableScrollPhysics(),
               children: [
                 DashBoard(),
                 Orders(),
