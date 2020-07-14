@@ -18,6 +18,45 @@ class _ManageMenuState extends State<ManageMenu> {
   String id;
   bool loading = false;
 
+  indlist(String type) {
+    return Container(
+      alignment: Alignment.center,
+      height: 450,
+      width: 300,
+      child: Expanded(
+        child: StreamBuilder<QuerySnapshot>(
+          stream: menuItemColRef
+              .where("Item_Type", isEqualTo: type)
+              .getDocuments()
+              .asStream(),
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            // count of events
+            final int eventCount = snapshot.data.documents.length;
+            print(eventCount);
+            if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
+            switch (snapshot.connectionState) {
+              case ConnectionState.waiting:
+                return Center(child: CircularProgressIndicator());
+              default:
+                return new ListView.builder(
+                  itemCount: eventCount,
+                  itemBuilder: (context, index) {
+                    final DocumentSnapshot document =
+                        snapshot.data.documents[index];
+                    return new ListTile(
+                      leading: Text(document.data['Item_Name'].toString()),
+                      trailing: Text('Rs ' + document.data['Price'].toString()),
+                    );
+                  },
+                );
+            }
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -257,9 +296,11 @@ class _ManageMenuState extends State<ManageMenu> {
                                       'Price': price.text,
                                       'Ratting': 5,
                                       'url': 'google.com'
-                                    }).whenComplete(() {setState(() {
-                                      loading = false;
-                                    });});
+                                    }).whenComplete(() {
+                                      setState(() {
+                                        loading = false;
+                                      });
+                                    });
                                     id = Uuid().v4();
                                     print('new ' + id);
                                   },
@@ -273,7 +314,9 @@ class _ManageMenuState extends State<ManageMenu> {
                                     borderRadius: BorderRadius.circular(15),
                                   ),
                                 ),
-                                loading?CircularProgressIndicator():Container(),
+                                loading
+                                    ? CircularProgressIndicator()
+                                    : Container(),
                                 Icon(Icons.local_dining, size: 100)
                               ],
                             ),
@@ -314,27 +357,7 @@ class _ManageMenuState extends State<ManageMenu> {
                                               fontWeight: FontWeight.bold),
                                         ),
                                       ),
-                                      Container(
-                                        alignment: Alignment.center,
-                                        height: 450,
-                                        width: 300,
-                                        child: ListView(
-                                          children: [
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                          ],
-                                        ),
-                                      )
+                                      indlist('Tandoor')
                                     ],
                                   ),
                                 ),
@@ -361,27 +384,7 @@ class _ManageMenuState extends State<ManageMenu> {
                                               fontWeight: FontWeight.bold),
                                         ),
                                       ),
-                                      Container(
-                                        alignment: Alignment.center,
-                                        height: 450,
-                                        width: 300,
-                                        child: ListView(
-                                          children: [
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                          ],
-                                        ),
-                                      )
+                                      indlist('Main Course')
                                     ],
                                   ),
                                 ),
@@ -408,27 +411,7 @@ class _ManageMenuState extends State<ManageMenu> {
                                               fontWeight: FontWeight.bold),
                                         ),
                                       ),
-                                      Container(
-                                        alignment: Alignment.center,
-                                        height: 450,
-                                        width: 300,
-                                        child: ListView(
-                                          children: [
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                          ],
-                                        ),
-                                      )
+                                      indlist('Chinese Main Course')
                                     ],
                                   ),
                                 ),
@@ -455,27 +438,7 @@ class _ManageMenuState extends State<ManageMenu> {
                                               fontWeight: FontWeight.bold),
                                         ),
                                       ),
-                                      Container(
-                                        alignment: Alignment.center,
-                                        height: 450,
-                                        width: 300,
-                                        child: ListView(
-                                          children: [
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                          ],
-                                        ),
-                                      )
+                                      indlist('Rice/Biryani')
                                     ],
                                   ),
                                 ),
@@ -512,27 +475,7 @@ class _ManageMenuState extends State<ManageMenu> {
                                               fontWeight: FontWeight.bold),
                                         ),
                                       ),
-                                      Container(
-                                        alignment: Alignment.center,
-                                        height: 450,
-                                        width: 300,
-                                        child: ListView(
-                                          children: [
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                          ],
-                                        ),
-                                      )
+                                      indlist('Noodles')
                                     ],
                                   ),
                                 ),
@@ -559,27 +502,7 @@ class _ManageMenuState extends State<ManageMenu> {
                                               fontWeight: FontWeight.bold),
                                         ),
                                       ),
-                                      Container(
-                                        alignment: Alignment.center,
-                                        height: 450,
-                                        width: 300,
-                                        child: ListView(
-                                          children: [
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                          ],
-                                        ),
-                                      )
+                                      indlist('Breads')
                                     ],
                                   ),
                                 ),
@@ -606,27 +529,7 @@ class _ManageMenuState extends State<ManageMenu> {
                                               fontWeight: FontWeight.bold),
                                         ),
                                       ),
-                                      Container(
-                                        alignment: Alignment.center,
-                                        height: 450,
-                                        width: 300,
-                                        child: ListView(
-                                          children: [
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                          ],
-                                        ),
-                                      )
+                                      indlist('Rolls and Momos')
                                     ],
                                   ),
                                 ),
@@ -653,27 +556,7 @@ class _ManageMenuState extends State<ManageMenu> {
                                               fontWeight: FontWeight.bold),
                                         ),
                                       ),
-                                      Container(
-                                        alignment: Alignment.center,
-                                        height: 450,
-                                        width: 300,
-                                        child: ListView(
-                                          children: [
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                            Text('asfsf'),
-                                          ],
-                                        ),
-                                      )
+                                      indlist('Salads & Raita')
                                     ],
                                   ),
                                 ),

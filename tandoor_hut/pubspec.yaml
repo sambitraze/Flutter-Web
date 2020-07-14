@@ -33,6 +33,7 @@ dependencies:
   cloud_firestore: 
   uuid:
   dwds: ^5.1.0
+  pdf: 
 
 dev_dependencies:
   flutter_test:
