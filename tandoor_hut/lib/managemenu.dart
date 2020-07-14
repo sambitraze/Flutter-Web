@@ -23,36 +23,34 @@ class _ManageMenuState extends State<ManageMenu> {
       alignment: Alignment.center,
       height: 450,
       width: 300,
-      child: Expanded(
-        child: StreamBuilder<QuerySnapshot>(
-          stream: menuItemColRef
-              .where("Item_Type", isEqualTo: type)
-              .getDocuments()
-              .asStream(),
-          builder:
-              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            // count of events
-            final int eventCount = snapshot.data.documents.length;
-            print(eventCount);
-            if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
-            switch (snapshot.connectionState) {
-              case ConnectionState.waiting:
-                return Center(child: CircularProgressIndicator());
-              default:
-                return new ListView.builder(
-                  itemCount: eventCount,
-                  itemBuilder: (context, index) {
-                    final DocumentSnapshot document =
-                        snapshot.data.documents[index];
-                    return new ListTile(
-                      leading: Text(document.data['Item_Name'].toString()),
-                      trailing: Text('Rs ' + document.data['Price'].toString()),
-                    );
-                  },
-                );
-            }
-          },
-        ),
+      child: StreamBuilder<QuerySnapshot>(
+        stream: menuItemColRef
+            .where("Item_Type", isEqualTo: type)
+            .getDocuments()
+            .asStream(),
+        builder:
+            (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          // count of events
+          final int eventCount = snapshot.data.documents.length;
+          print(eventCount);
+          if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return Center(child: CircularProgressIndicator());
+            default:
+              return new ListView.builder(
+                itemCount: eventCount,
+                itemBuilder: (context, index) {
+                  final DocumentSnapshot document =
+                      snapshot.data.documents[index];
+                  return new ListTile(
+                    leading: Text(document.data['Item_Name'].toString()),
+                    trailing: Text('Rs ' + document.data['Price'].toString()),
+                  );
+                },
+              );
+          }
+        },
       ),
     );
   }

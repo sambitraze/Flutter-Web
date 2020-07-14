@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:pdf/pdf.dart';
 import 'package:slide_digital_clock/slide_digital_clock.dart';
-import 'package:tandoor_hut/pdfcreater.dart';
+import 'package:tandoor_hut/demoPrint.dart';
+
 
 final menuItemColRef = Firestore.instance.collection('MenuItems');
 
@@ -11,6 +13,7 @@ class Billing extends StatefulWidget {
 }
 
 class _BillingState extends State<Billing> {
+  String type;
   bool loading = false;
   TextEditingController itemName = TextEditingController();
   TextEditingController quantity = TextEditingController();
@@ -78,7 +81,7 @@ class _BillingState extends State<Billing> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'Inovice ',
+                              'Invoice',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 42,
@@ -180,7 +183,7 @@ class _BillingState extends State<Billing> {
                                           focusColor: Colors.white,
                                           fillColor: Colors.white,
                                           filled: true,
-                                          hintText: 'Qauntity',
+                                          hintText: 'Quantity',
                                           enabledBorder: OutlineInputBorder(
                                             borderRadius:
                                                 BorderRadius.circular(15),
@@ -322,7 +325,7 @@ class _BillingState extends State<Billing> {
                                             ),
                                             DataColumn(
                                               label: Text(
-                                                'Price/Unit',
+                                                'Unit Price',
                                                 style: TextStyle(
                                                     fontStyle: FontStyle.italic,
                                                     fontSize: 16),
@@ -330,7 +333,7 @@ class _BillingState extends State<Billing> {
                                             ),
                                             DataColumn(
                                               label: Text(
-                                                'Quantiy',
+                                                'Quantity',
                                                 style: TextStyle(
                                                     fontStyle: FontStyle.italic,
                                                     fontSize: 16),
@@ -388,7 +391,7 @@ class _BillingState extends State<Billing> {
                                                       itemsum.toString()),
                                                 ),
                                                 ListTile(
-                                                  leading: Text('Packing'),
+                                                  leading: Text('Packaging'),
                                                   trailing: Text('Rs ' +
                                                       packing.toString()),
                                                 ),
@@ -493,19 +496,24 @@ class _BillingState extends State<Billing> {
                                       width: 200,
                                       alignment: Alignment.center,
                                       child: DropdownButton(
+                                        value: type,
                                         focusColor: Colors.white,
-                                        hint: Text('Payemnt Type'),
+                                        hint: Text('Payment Type'),
                                         items: [
                                           DropdownMenuItem(
                                             child: Text('Cash'),
                                             value: 'Cash',
                                           ),
-                                          DropdownMenuItem(
-                                            child: Text('UPI'),
-                                            value: 'UPI',
-                                          ),
+                                          // DropdownMenuItem(
+                                          //   child: Text('UPI'),
+                                          //   value: 'UPI',
+                                          // ),
                                         ],
-                                        onChanged: (value) => print(value),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            type = value;
+                                          });
+                                        },
                                       ),
                                     ),
                                     MaterialButton(
