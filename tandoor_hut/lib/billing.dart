@@ -1,11 +1,14 @@
+import 'dart:convert';
+// import 'package:universal_io/prefer_sdk/io.dart'as f;
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:pdf/pdf.dart';
 import 'package:slide_digital_clock/slide_digital_clock.dart';
-import 'package:tandoor_hut/demoPrint.dart';
-
+import 'package:http/http.dart' as http;
 
 final menuItemColRef = Firestore.instance.collection('MenuItems');
+final FirebaseStorage storage = FirebaseStorage.instance;
+// StorageUploadTask _uploadTask;
 
 class Billing extends StatefulWidget {
   @override
@@ -517,25 +520,63 @@ class _BillingState extends State<Billing> {
                                       ),
                                     ),
                                     MaterialButton(
-                                      onPressed: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) => AlertDialog(
-                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                                            title: Text('Proccesing'),
-                                            content: Container(
-                                              height: 100,
-                                              width: 100,
-                                              child:
-                                                  Padding(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 12.0,vertical: 35),
-                                                    child: LinearProgressIndicator(
-                                                      
-                                                    ),
-                                                  ),
-                                            ),
+                                      onPressed: () async {
+                                        // showDialog(
+                                        //   context: context,
+                                        //   builder: (context) => AlertDialog(
+                                        //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                                        //     title: Text('Proccesing'),
+                                        //     content: Container(
+                                        //       height: 100,
+                                        //       width: 100,
+                                        //       child:
+                                        //           Padding(
+                                        //             padding: const EdgeInsets.symmetric(horizontal: 12.0,vertical: 35),
+                                        //             child: LinearProgressIndicator(
+
+                                        //             ),
+                                        //           ),
+                                        //     ),
+                                        //   ),
+                                        // );
+                                        // http.Response response = await http.get('https://jsontopdfconverter.herokuapp.com/');
+                                        http.Response response =
+                                            await http.post(
+                                          'https://jsontopdfconverter.herokuapp.com/getPdf',
+                                          headers: <String, String>{
+                                            'Content-Type':
+                                                'application/json; charset=UTF-8',
+                                          },
+                                          body: jsonEncode(
+                                            <String, dynamic>{
+                                              "bill_no": 10,
+                                              "bill_to": "lol",
+                                              "cashier_name": "Ravi",
+                                              "sno": [1, 2],
+                                              "item": ["item1", "item2"],
+                                              "qty": [10, 20],
+                                              "priceu": [200, 300],
+                                              "gst": [30, 40],
+                                              "amount": [500, 600],
+                                              "total_qty": 30,
+                                              "total_gst": 50,
+                                              "total_amt": 5000,
+                                              "subtotal": 150,
+                                              "cgst": 20,
+                                              "sgst": 30,
+                                              "date": "12-07-2020",
+                                              "total": 6050,
+                                              "received": 6000,
+                                              "balance": 50
+                                            },
                                           ),
                                         );
+                                        print(response.statusCode);
+                                        print(response.bodyBytes.toString());
+                                        
+                                       StorageUploadTask uploadTask = storage.ref()
+                                              .child('bills/').putData(response.bodyBytes);
+                                       print(uploadTask.isSuccessful);
                                       },
                                       child: Text(
                                         'Print Bill',

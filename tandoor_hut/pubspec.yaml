@@ -37,6 +37,8 @@ dependencies:
   pdf: 
   custom_splash: ^0.0.2
   firebase_auth:
+  http:
+  universal_io: ^1.0.1
 
 dev_dependencies:
   flutter_test:
