@@ -31,7 +31,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.3
   slide_digital_clock: ^1.0.0
-  # firebase: ^7.3.0
+  firebase: ^7.3.0
   cloud_firestore: 
   uuid:
   dwds: ^5.1.0
@@ -39,8 +39,7 @@ dependencies:
   custom_splash: ^0.0.2
   firebase_auth:
   http:
-  universal_io: ^1.0.1
-
+  universal_html:
 dev_dependencies:
   flutter_test:
     sdk: flutter

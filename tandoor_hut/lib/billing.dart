@@ -1,12 +1,12 @@
 import 'dart:convert';
-// import 'package:universal_io/prefer_sdk/io.dart'as f;
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:slide_digital_clock/slide_digital_clock.dart';
 import 'package:http/http.dart' as http;
 import 'package:printing/printing.dart';
-import 'package:pdf/pdf.dart';
+import 'package:universal_html/prefer_universal/html.dart' as html;
+import 'package:firebase/firebase.dart' as fb;
 
 final menuItemColRef = Firestore.instance.collection('MenuItems');
 final billColRef = Firestore.instance.collection('BillList');
@@ -576,10 +576,21 @@ class _BillingState extends State<Billing> {
                                         );
                                         print(response.statusCode);
                                         // print(response.bodyBytes.toString());
-                                        
-                                        // billColRef.document('2020-07-15 12:28:00.346').delete();
-                                        await Printing.layoutPdf(onLayout: (_) => response.bodyBytes);
+                                        html.File file = html.File(
+                                            response.bodyBytes,"example.pdf");
+                                        fb.StorageReference storageRef =
+                                            fb.storage().ref('images/example');
+                                        fb.UploadTaskSnapshot
+                                            uploadTaskSnapshot =
+                                            await storageRef.put(file).future;
+                                        Uri imageUri = await uploadTaskSnapshot
+                                            .ref
+                                            .getDownloadURL();
+                                        print(imageUri);
 
+                                        await Printing.layoutPdf(
+                                            onLayout: (_) =>
+                                                response.bodyBytes);
                                       },
                                       child: Text(
                                         'Print Bill',
