@@ -11,6 +11,7 @@ import 'package:firebase/firebase.dart' as fb;
 final menuItemColRef = Firestore.instance.collection('MenuItems');
 final billColRef = Firestore.instance.collection('BillList');
 final FirebaseStorage storage = FirebaseStorage.instance;
+
 // StorageUploadTask _uploadTask;
 
 class Billing extends StatefulWidget {
@@ -21,12 +22,16 @@ class Billing extends StatefulWidget {
 class _BillingState extends State<Billing> {
   String type;
   bool loading = false;
+  TextEditingController customer = TextEditingController();
+  TextEditingController phoneNo = TextEditingController();
   TextEditingController itemName = TextEditingController();
   TextEditingController quantity = TextEditingController();
+  String cashier = 'Example name';
   List itemList = [];
   List srlno = [];
+  bool load = false;
   int srl = 1;
-  List quant = [];
+  List<int> quant = [];
   List priceunit = [];
   List amount = [];
   List<DataRow> rowList = [];
@@ -211,7 +216,10 @@ class _BillingState extends State<Billing> {
                                       onPressed: () {
                                         setState(() {
                                           loading = true;
+                                          
                                         });
+                                        
+                                        print(srl);
                                         menuItemColRef
                                             .where("Item_Name",
                                                 isEqualTo: itemName.text)
@@ -221,12 +229,12 @@ class _BillingState extends State<Billing> {
                                             querySnapshot.documents.forEach(
                                               (result) {
                                                 print(result.data);
-                                                srlno.add("1");
+                                                srlno.add(srl);
                                                 itemList.add(
                                                     result.data['Item_Name']);
                                                 priceunit
                                                     .add(result.data['Price']);
-                                                quant.add(quantity.text);
+                                                quant.add(int.parse(quantity.text));
                                                 amount.add((int.parse(
                                                         quantity.text) *
                                                     int.parse(
@@ -239,7 +247,7 @@ class _BillingState extends State<Billing> {
                                                     double.parse(
                                                         quantity.text));
                                                 rowList.add(DataRow(cells: [
-                                                  DataCell(Text("1")),
+                                                  DataCell(Text(srl.toString())),
                                                   DataCell(Text(result
                                                       .data['Item_Name'])),
                                                   DataCell(Text(
@@ -259,10 +267,12 @@ class _BillingState extends State<Billing> {
                                             setState(
                                               () {
                                                 loading = false;
+                                                srl++;
                                               },
                                             );
                                           },
                                         );
+                                       
                                       },
                                       child: Text(
                                         'Add',
@@ -442,6 +452,7 @@ class _BillingState extends State<Billing> {
                                       width: 250,
                                       alignment: Alignment.center,
                                       child: TextFormField(
+                                        controller: customer,
                                         decoration: InputDecoration(
                                           prefixIcon: Icon(Icons.person),
                                           focusColor: Colors.white,
@@ -470,6 +481,7 @@ class _BillingState extends State<Billing> {
                                       width: 250,
                                       alignment: Alignment.center,
                                       child: TextFormField(
+                                        controller: phoneNo,
                                         decoration: InputDecoration(
                                           prefixIcon: Icon(Icons.phone),
                                           focusColor: Colors.white,
@@ -524,25 +536,34 @@ class _BillingState extends State<Billing> {
                                     ),
                                     MaterialButton(
                                       onPressed: () async {
-                                        // showDialog(
-                                        //   context: context,
-                                        //   builder: (context) => AlertDialog(
-                                        //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                                        //     title: Text('Proccesing'),
-                                        //     content: Container(
-                                        //       height: 100,
-                                        //       width: 100,
-                                        //       child:
-                                        //           Padding(
-                                        //             padding: const EdgeInsets.symmetric(horizontal: 12.0,vertical: 35),
-                                        //             child: LinearProgressIndicator(
+                                        setState(() {
+                                          load = true;
+                                        });
+                                        load?showDialog(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                                            title: Text('Proccesing'),
+                                            content: Container(
+                                              height: 100,
+                                              width: 100,
+                                              child:
+                                                  Padding(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 12.0,vertical: 35),
+                                                    child: LinearProgressIndicator(
 
-                                        //             ),
-                                        //           ),
-                                        //     ),
-                                        //   ),
-                                        // );
-                                        // http.Response response = await http.get('https://jsontopdfconverter.herokuapp.com/');
+                                                    ),
+                                                  ),
+                                            ),
+                                          ),
+                                        ):Text('');
+                                        
+                                        var billno = 0;
+                                        billColRef.document('info').get().then((value) {setState(() {
+                                          billno = int.parse(value.data['takeid']);
+                                          print(value.data);
+                                        });},);
+                                        print(billno.toString()+'bill');
                                         http.Response response =
                                             await http.post(
                                           'https://jsontopdfconverter.herokuapp.com/getPdf',
@@ -552,34 +573,35 @@ class _BillingState extends State<Billing> {
                                           },
                                           body: jsonEncode(
                                             <String, dynamic>{
-                                              "bill_no": 10,
-                                              "bill_to": "lol",
-                                              "cashier_name": "Ravi",
-                                              "sno": [1, 2],
-                                              "item": ["item1", "item2"],
-                                              "qty": [10, 20],
-                                              "priceu": [200, 300],
-                                              "gst": [30, 40],
-                                              "amount": [500, 600],
-                                              "total_qty": 30,
-                                              "total_gst": 50,
-                                              "total_amt": 5000,
-                                              "subtotal": 150,
-                                              "cgst": 20,
-                                              "sgst": 30,
+                                              "bill_no": 1,
+                                              "bill_to":cashier,
+                                              "cashier_name": customer.text,
+                                              "sno": srlno,
+                                              "item": itemList,
+                                              "qty": quant,
+                                              "priceu": priceunit,
+                                              "gst": [],
+                                              "amount": amount,
+                                              "total_qty": quant.reduce((value, element) => value+element),
+                                              "total_gst": 0,
+                                              "total_amt": itemsum,
+                                              "subtotal": itemsum+packing,
+                                              "cgst": (gstCharge/2).toStringAsFixed(2),
+                                              "sgst": (gstCharge/2).toStringAsFixed(2),
                                               "date": "12-07-2020",
-                                              "total": 6050,
-                                              "received": 6000,
-                                              "balance": 50
+                                              "total": grandtot,
+                                              "received": 0,
+                                              "balance": 0
                                             },
                                           ),
                                         );
                                         print(response.statusCode);
-                                        // print(response.bodyBytes.toString());
+                                        print(response.bodyBytes.toString());
                                         html.File file = html.File(
-                                            response.bodyBytes,"example.pdf");
+                                            response.bodyBytes.toList(),"$billno.pdf");
+                                            
                                         fb.StorageReference storageRef =
-                                            fb.storage().ref('images/example');
+                                            fb.storage().ref('images/$billno.pdf');
                                         fb.UploadTaskSnapshot
                                             uploadTaskSnapshot =
                                             await storageRef.put(file).future;
@@ -587,10 +609,14 @@ class _BillingState extends State<Billing> {
                                             .ref
                                             .getDownloadURL();
                                         print(imageUri);
-
                                         await Printing.layoutPdf(
                                             onLayout: (_) =>
                                                 response.bodyBytes);
+                                                setState(() {
+                                                  srl =1;
+                                                  load = false;
+                                                });
+                                                Navigator.of(context).pop();
                                       },
                                       child: Text(
                                         'Print Bill',
