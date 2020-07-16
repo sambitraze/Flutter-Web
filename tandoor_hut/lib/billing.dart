@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:slide_digital_clock/slide_digital_clock.dart';
 import 'package:http/http.dart' as http;
 import 'package:printing/printing.dart';
-import 'package:universal_html/prefer_universal/html.dart' as html;
-import 'package:firebase/firebase.dart' as fb;
+// import 'package:universal_html/prefer_universal/html.dart' as html;
+// import 'package:firebase/firebase.dart' as fb;
 
 final menuItemColRef = Firestore.instance.collection('MenuItems');
 final billColRef = Firestore.instance.collection('BillList');
@@ -35,10 +35,11 @@ class _BillingState extends State<Billing> {
   List priceunit = [];
   List amount = [];
   List<DataRow> rowList = [];
+  int billno = 0;
 
   double itemsum = 0;
-  double packing = 10;
-  double gstper = 0.07;
+  double packing = 0;
+  double gstper = 0.00;
   double gstCharge = 0.0;
   double grandtot = 0.0;
 
@@ -48,6 +49,19 @@ class _BillingState extends State<Billing> {
       gstCharge = itemsum * gstper;
       grandtot = gstCharge + packing + itemsum;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    billColRef.document('info').get().then(
+      (value) {
+        setState(() {
+          billno = value.data['takeid'];
+          print('got1' + billno.toString());
+        });
+      },
+    );
   }
 
   @override
@@ -216,63 +230,69 @@ class _BillingState extends State<Billing> {
                                       onPressed: () {
                                         setState(() {
                                           loading = true;
-                                          
                                         });
-                                        
-                                        print(srl);
                                         menuItemColRef
                                             .where("Item_Name",
                                                 isEqualTo: itemName.text)
                                             .getDocuments()
                                             .then(
                                           (querySnapshot) {
-                                            querySnapshot.documents.forEach(
-                                              (result) {
-                                                print(result.data);
-                                                srlno.add(srl);
-                                                itemList.add(
-                                                    result.data['Item_Name']);
-                                                priceunit
-                                                    .add(result.data['Price']);
-                                                quant.add(int.parse(quantity.text));
-                                                amount.add((int.parse(
-                                                        quantity.text) *
-                                                    int.parse(
-                                                        result.data['Price'])));
-                                                additemtotal(
-                                                    (int.parse(quantity.text) *
+                                            if (querySnapshot
+                                                    .documents.length !=
+                                                0) {
+                                              querySnapshot.documents.forEach(
+                                                (result) {
+                                                  srlno.add(srl);
+                                                  itemList.add(
+                                                      result.data['Item_Name']);
+                                                  priceunit.add(
+                                                      result.data['Price']);
+                                                  quant.add(
+                                                      int.parse(quantity.text));
+                                                  amount.add((int.parse(
+                                                          quantity.text) *
+                                                      int.parse(result
+                                                          .data['Price'])));
+                                                  additemtotal(
+                                                      (int.parse(quantity
+                                                                  .text) *
+                                                              int.parse(
+                                                                  result.data[
+                                                                      'Price']))
+                                                          .toDouble(),
+                                                      double.parse(
+                                                          quantity.text));
+                                                  rowList.add(DataRow(cells: [
+                                                    DataCell(
+                                                        Text(srl.toString())),
+                                                    DataCell(Text(result
+                                                        .data['Item_Name'])),
+                                                    DataCell(Text(
+                                                        result.data['Price'])),
+                                                    DataCell(
+                                                        Text(quantity.text)),
+                                                    DataCell(Text((int.parse(
+                                                                quantity.text) *
                                                             int.parse(result
                                                                 .data['Price']))
-                                                        .toDouble(),
-                                                    double.parse(
-                                                        quantity.text));
-                                                rowList.add(DataRow(cells: [
-                                                  DataCell(Text(srl.toString())),
-                                                  DataCell(Text(result
-                                                      .data['Item_Name'])),
-                                                  DataCell(Text(
-                                                      result.data['Price'])),
-                                                  DataCell(Text(quantity.text)),
-                                                  DataCell(Text((int.parse(
-                                                              quantity.text) *
-                                                          int.parse(result
-                                                              .data['Price']))
-                                                      .toString())),
-                                                ]));
-                                              },
-                                            );
+                                                        .toString())),
+                                                  ]));
+                                                },
+                                              );
+                                              setState(() {
+                                                srl++;
+                                              });
+                                            }
                                           },
                                         ).whenComplete(
                                           () {
                                             setState(
                                               () {
                                                 loading = false;
-                                                srl++;
                                               },
                                             );
                                           },
                                         );
-                                       
                                       },
                                       child: Text(
                                         'Add',
@@ -380,7 +400,7 @@ class _BillingState extends State<Billing> {
                                         children: [
                                           Container(
                                             height: 50,
-                                            width: 500,
+                                            width: 400,
                                             alignment: Alignment.center,
                                             color: Colors.orange[400],
                                             child: Text(
@@ -539,31 +559,34 @@ class _BillingState extends State<Billing> {
                                         setState(() {
                                           load = true;
                                         });
-                                        load?showDialog(
-                                          context: context,
-                                          builder: (context) => AlertDialog(
-                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                                            title: Text('Proccesing'),
-                                            content: Container(
-                                              height: 100,
-                                              width: 100,
-                                              child:
-                                                  Padding(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 12.0,vertical: 35),
-                                                    child: LinearProgressIndicator(
-
+                                        load
+                                            ? showDialog(
+                                                context: context,
+                                                builder: (context) =>
+                                                    AlertDialog(
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              18)),
+                                                  title: Text('Proccesing'),
+                                                  content: Container(
+                                                    height: 100,
+                                                    width: 100,
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                              .symmetric(
+                                                          horizontal: 12.0,
+                                                          vertical: 35),
+                                                      child:
+                                                          LinearProgressIndicator(),
                                                     ),
                                                   ),
-                                            ),
-                                          ),
-                                        ):Text('');
-                                        
-                                        var billno = 0;
-                                        billColRef.document('info').get().then((value) {setState(() {
-                                          billno = int.parse(value.data['takeid']);
-                                          print(value.data);
-                                        });},);
-                                        print(billno.toString()+'bill');
+                                                ),
+                                              )
+                                            : Text('');
+
+                                        print('got2' + billno.toString());
+
                                         http.Response response =
                                             await http.post(
                                           'https://jsontopdfconverter.herokuapp.com/getPdf',
@@ -573,50 +596,67 @@ class _BillingState extends State<Billing> {
                                           },
                                           body: jsonEncode(
                                             <String, dynamic>{
-                                              "bill_no": 1,
-                                              "bill_to":cashier,
-                                              "cashier_name": customer.text,
+                                              "bill_no": billno,
+                                              "bill_to": customer.text,
+                                              "mob_no": phoneNo.text,
                                               "sno": srlno,
                                               "item": itemList,
                                               "qty": quant,
                                               "priceu": priceunit,
-                                              "gst": [],
+                                              "gst":[],
                                               "amount": amount,
-                                              "total_qty": quant.reduce((value, element) => value+element),
-                                              "total_gst": 0,
+                                              "total_qty": quant.reduce(
+                                                  (value, element) =>
+                                                      value + element),
+                                              "total_gst": 50,
                                               "total_amt": itemsum,
-                                              "subtotal": itemsum+packing,
-                                              "cgst": (gstCharge/2).toStringAsFixed(2),
-                                              "sgst": (gstCharge/2).toStringAsFixed(2),
+                                              "subtotal": itemsum + packing,
+                                              "cgst": (gstCharge / 2)
+                                                  .toStringAsFixed(2),
+                                              "sgst": (gstCharge / 2)
+                                                  .toStringAsFixed(2),
                                               "date": "12-07-2020",
                                               "total": grandtot,
-                                              "received": 0,
-                                              "balance": 0
                                             },
                                           ),
                                         );
                                         print(response.statusCode);
-                                        print(response.bodyBytes.toString());
-                                        html.File file = html.File(
-                                            response.bodyBytes.toList(),"$billno.pdf");
-                                            
-                                        fb.StorageReference storageRef =
-                                            fb.storage().ref('images/$billno.pdf');
-                                        fb.UploadTaskSnapshot
-                                            uploadTaskSnapshot =
-                                            await storageRef.put(file).future;
-                                        Uri imageUri = await uploadTaskSnapshot
-                                            .ref
-                                            .getDownloadURL();
-                                        print(imageUri);
+                                        billColRef
+                                            .document(billno.toString())
+                                            .setData({
+                                          "bill_no": billno.toString(),
+                                          "bill_to": customer.text.toString(),
+                                          "mob_no": phoneNo.text.toString(),
+                                          "sno": srlno,
+                                          "item": itemList,
+                                          "qty": quant,
+                                          "priceu": priceunit,
+                                          "amount": amount,
+                                          "total_qty": quant.reduce(
+                                              (value, element) =>
+                                                  value + element),
+                                          "total_amt": itemsum,
+                                          "subtotal": itemsum + packing,
+                                          "cgst": (gstCharge / 2)
+                                              .toStringAsFixed(2),
+                                          "sgst": (gstCharge / 2)
+                                              .toStringAsFixed(2),
+                                          "date": "12-07-2020",
+                                          "total": grandtot,
+                                        });
                                         await Printing.layoutPdf(
                                             onLayout: (_) =>
                                                 response.bodyBytes);
-                                                setState(() {
-                                                  srl =1;
-                                                  load = false;
-                                                });
-                                                Navigator.of(context).pop();
+                                        setState(() {
+                                          srl = 1;
+                                          load = false;
+                                        });
+                                        Navigator.of(context).pop();
+                                        billno++;
+                                        billColRef.document('info').updateData({
+                                          "takeid": billno,
+                                        });
+                                        print('new' + billno.toString());
                                       },
                                       child: Text(
                                         'Print Bill',
