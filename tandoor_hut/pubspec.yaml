@@ -40,6 +40,9 @@ dependencies:
   firebase_auth:
   http:
   universal_html:
+  intl:
+  toast:
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

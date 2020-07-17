@@ -1,18 +1,13 @@
 import 'dart:convert';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:slide_digital_clock/slide_digital_clock.dart';
 import 'package:http/http.dart' as http;
 import 'package:printing/printing.dart';
-// import 'package:universal_html/prefer_universal/html.dart' as html;
-// import 'package:firebase/firebase.dart' as fb;
 
 final menuItemColRef = Firestore.instance.collection('MenuItems');
 final billColRef = Firestore.instance.collection('BillList');
-final FirebaseStorage storage = FirebaseStorage.instance;
-
-// StorageUploadTask _uploadTask;
 
 class Billing extends StatefulWidget {
   @override
@@ -39,15 +34,15 @@ class _BillingState extends State<Billing> {
 
   double itemsum = 0;
   double packing = 0;
-  double gstper = 0.00;
+  double gstper = 0;
   double gstCharge = 0.0;
   double grandtot = 0.0;
 
   additemtotal(double val, double quanti) {
     setState(() {
       itemsum += val;
-      gstCharge = itemsum * gstper;
-      grandtot = gstCharge + packing + itemsum;
+      gstCharge = itemsum * gstper * 0.01;
+      grandtot = gstCharge + itemsum;
     });
   }
 
@@ -59,6 +54,53 @@ class _BillingState extends State<Billing> {
         setState(() {
           billno = value.data['takeid'];
           print('got1' + billno.toString());
+        });
+      },
+    );
+  }
+
+  packDrop() {
+    return DropdownButton(      
+      value: packing,
+      hint: Text('Packing Charge'),
+      items: [
+        DropdownMenuItem(
+          child: Text('packing: 0'),
+          value: 0,
+        ),
+        DropdownMenuItem(
+          child: Text('packing: 5'),
+          value: 5,
+        ),
+        DropdownMenuItem(
+          child: Text('packing: 10'),
+          value: 10,
+        ),
+        DropdownMenuItem(
+          child: Text('packing: 15'),
+          value: 15,
+        ),
+        DropdownMenuItem(
+          child: Text('packing: 20'),
+          value: 20,
+        )
+      ],
+      onChanged: (value) {
+        setState(() {
+          packing = value;
+        });
+      },
+    );
+  }
+  List<DropdownMenuItem> gstList = List.generate(25, (index) =>DropdownMenuItem(child: Text('GST '+index.toString()+" %"),value: index,));
+  gstDrop() {
+    return DropdownButton(
+      value: gstper,
+      hint: Text('Gst percentage'),
+      items: gstList,
+      onChanged: (value) {
+        setState(() {
+          gstper = value;
         });
       },
     );
@@ -124,10 +166,6 @@ class _BillingState extends State<Billing> {
                         ),
                       ),
                       Container(
-                        // decoration: BoxDecoration(
-                        //   borderRadius: BorderRadius.circular(15),
-                        //   color: Colors.black38,
-                        // ),
                         padding: EdgeInsets.all(12),
                         child: DigitalClock(
                           areaDecoration:
@@ -157,7 +195,7 @@ class _BillingState extends State<Billing> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.all(15.0),
+                                padding: const EdgeInsets.symmetric(horizontal:15.0),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment:
@@ -167,6 +205,23 @@ class _BillingState extends State<Billing> {
                                       'assets/minilogo.png',
                                       fit: BoxFit.cover,
                                       height: 100,
+                                    ),
+                                    packDrop(),
+                                    gstDrop(),
+                                    Icon(Icons.receipt, size: 100)
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 30, vertical: 0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Near SBI ATM Godhna Road Ara, Bhojpur,\nPhone Number - 9852259112, 8340245998',
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(fontSize: 18),
                                     ),
                                     Container(
                                       height: 100,
@@ -307,17 +362,7 @@ class _BillingState extends State<Billing> {
                                     loading
                                         ? CircularProgressIndicator()
                                         : Container(),
-                                    Icon(Icons.receipt, size: 100)
                                   ],
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 30, vertical: 15),
-                                child: Text(
-                                  'Near SBI ATM Godhna Road Ara, Bhojpur,\nPhone Number - 9776999273',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(fontSize: 18),
                                 ),
                               )
                             ],
@@ -432,7 +477,7 @@ class _BillingState extends State<Billing> {
                                                       packing.toString()),
                                                 ),
                                                 ListTile(
-                                                  leading: Text('GST @ 7%'),
+                                                  leading: Text('GST @ '+gstper.toString()),
                                                   trailing: Text('Rs ' +
                                                       gstCharge
                                                           .toStringAsFixed(2)),
@@ -447,7 +492,7 @@ class _BillingState extends State<Billing> {
                                                       ),
                                                     ),
                                                     child: Text('Rs ' +
-                                                        grandtot
+                                                        (packing+grandtot)
                                                             .toStringAsFixed(
                                                                 2)),
                                                   ),
@@ -585,8 +630,9 @@ class _BillingState extends State<Billing> {
                                               )
                                             : Text('');
 
-                                        print('got2' + billno.toString());
-
+                                        String date = DateFormat('dd-MM-yyy')
+                                            .format(DateTime.now());
+                                            print(date);
                                         http.Response response =
                                             await http.post(
                                           'https://jsontopdfconverter.herokuapp.com/getPdf',
@@ -603,7 +649,7 @@ class _BillingState extends State<Billing> {
                                               "item": itemList,
                                               "qty": quant,
                                               "priceu": priceunit,
-                                              "gst":[],
+                                              "gst": [],
                                               "amount": amount,
                                               "total_qty": quant.reduce(
                                                   (value, element) =>
@@ -615,8 +661,8 @@ class _BillingState extends State<Billing> {
                                                   .toStringAsFixed(2),
                                               "sgst": (gstCharge / 2)
                                                   .toStringAsFixed(2),
-                                              "date": "12-07-2020",
-                                              "total": grandtot,
+                                              "date": date,
+                                              "total": grandtot+packing,
                                             },
                                           ),
                                         );
@@ -641,8 +687,8 @@ class _BillingState extends State<Billing> {
                                               .toStringAsFixed(2),
                                           "sgst": (gstCharge / 2)
                                               .toStringAsFixed(2),
-                                          "date": "12-07-2020",
-                                          "total": grandtot,
+                                          "date": DateTime.now(),
+                                          "total": grandtot+packing,
                                         });
                                         await Printing.layoutPdf(
                                             onLayout: (_) =>
