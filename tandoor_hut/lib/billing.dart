@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:slide_digital_clock/slide_digital_clock.dart';
 import 'package:http/http.dart' as http;
 import 'package:printing/printing.dart';
+import 'package:searchable_dropdown/searchable_dropdown.dart';
 
 final menuItemColRef = Firestore.instance.collection('MenuItems');
 final billColRef = Firestore.instance.collection('BillList');
@@ -17,6 +18,7 @@ class Billing extends StatefulWidget {
 class _BillingState extends State<Billing> {
   String type;
   bool loading = false;
+  List<DropdownMenuItem> getItems = [];
   TextEditingController customer = TextEditingController();
   TextEditingController phoneNo = TextEditingController();
   TextEditingController itemName = TextEditingController();
@@ -49,6 +51,14 @@ class _BillingState extends State<Billing> {
   @override
   void initState() {
     super.initState();
+    menuItemColRef.getDocuments().then((value) {
+      value.documents.forEach((element) {
+        getItems.add(DropdownMenuItem(
+          child: Text(element.data['Item_Name']),
+          value: element.data['Item_Name'].toString(),
+        ));
+      });
+    });
     billColRef.document('info').get().then(
       (value) {
         setState(() {
@@ -60,7 +70,7 @@ class _BillingState extends State<Billing> {
   }
 
   packDrop() {
-    return DropdownButton(      
+    return DropdownButton(
       value: packing,
       hint: Text('Packing Charge'),
       items: [
@@ -92,7 +102,13 @@ class _BillingState extends State<Billing> {
       },
     );
   }
-  List<DropdownMenuItem> gstList = List.generate(25, (index) =>DropdownMenuItem(child: Text('GST '+index.toString()+" %"),value: index,));
+
+  List<DropdownMenuItem> gstList = List.generate(
+      25,
+      (index) => DropdownMenuItem(
+            child: Text('GST ' + index.toString() + " %"),
+            value: index,
+          ));
   gstDrop() {
     return DropdownButton(
       value: gstper,
@@ -195,7 +211,8 @@ class _BillingState extends State<Billing> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal:15.0),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 15.0),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment:
@@ -216,7 +233,8 @@ class _BillingState extends State<Billing> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 30, vertical: 0),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       'Near SBI ATM Godhna Road Ara, Bhojpur,\nPhone Number - 9852259112, 8340245998',
@@ -224,34 +242,57 @@ class _BillingState extends State<Billing> {
                                       style: TextStyle(fontSize: 18),
                                     ),
                                     Container(
-                                      height: 100,
+                                      padding: EdgeInsets.all(10),
+                                      height: 65,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(15),
+                                        color: Colors.white,
+                                      ),
                                       width: 400,
                                       alignment: Alignment.center,
-                                      child: TextFormField(
-                                        controller: itemName,
-                                        decoration: InputDecoration(
-                                          prefixIcon: Icon(Icons.search),
-                                          focusColor: Colors.white,
-                                          fillColor: Colors.white,
-                                          filled: true,
-                                          hintText: 'Search Item',
-                                          enabledBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(15),
-                                            borderSide: BorderSide(
-                                                color: Colors.white,
-                                                width: 1.0),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(15),
-                                            borderSide: BorderSide(
-                                                color: Colors.white,
-                                                width: 2.0),
-                                          ),
-                                        ),
+                                      child: SearchableDropdown.single(
+                                        items: getItems,
+                                        value: itemName,
+                                        hint: 'Search',
+                                        searchHint: 'sea',
+                                        onChanged: (value) {
+                                          print(value);
+                                          setState(() {
+                                            itemName.text = value;
+                                          });
+                                        },
+                                        isExpanded: true,
                                       ),
                                     ),
+                                    // Container(
+                                    //   height: 100,
+                                    //   width: 400,
+                                    //   alignment: Alignment.center,
+                                    //   child: TextFormField(
+                                    //     controller: itemName,
+                                    //     decoration: InputDecoration(
+                                    //       prefixIcon: Icon(Icons.search),
+                                    //       focusColor: Colors.white,
+                                    //       fillColor: Colors.white,
+                                    //       filled: true,
+                                    //       hintText: 'Search Item',
+                                    //       enabledBorder: OutlineInputBorder(
+                                    //         borderRadius:
+                                    //             BorderRadius.circular(15),
+                                    //         borderSide: BorderSide(
+                                    //             color: Colors.white,
+                                    //             width: 1.0),
+                                    //       ),
+                                    //       focusedBorder: OutlineInputBorder(
+                                    //         borderRadius:
+                                    //             BorderRadius.circular(15),
+                                    //         borderSide: BorderSide(
+                                    //             color: Colors.white,
+                                    //             width: 2.0),
+                                    //       ),
+                                    //     ),
+                                    //   ),
+                                    // ),
                                     Container(
                                       height: 100,
                                       width: 200,
@@ -477,7 +518,8 @@ class _BillingState extends State<Billing> {
                                                       packing.toString()),
                                                 ),
                                                 ListTile(
-                                                  leading: Text('GST @ '+gstper.toString()),
+                                                  leading: Text('GST @ ' +
+                                                      gstper.toString()),
                                                   trailing: Text('Rs ' +
                                                       gstCharge
                                                           .toStringAsFixed(2)),
@@ -492,7 +534,7 @@ class _BillingState extends State<Billing> {
                                                       ),
                                                     ),
                                                     child: Text('Rs ' +
-                                                        (packing+grandtot)
+                                                        (packing + grandtot)
                                                             .toStringAsFixed(
                                                                 2)),
                                                   ),
@@ -632,7 +674,7 @@ class _BillingState extends State<Billing> {
 
                                         String date = DateFormat('dd-MM-yyy')
                                             .format(DateTime.now());
-                                            print(date);
+                                        print(date);
                                         http.Response response =
                                             await http.post(
                                           'https://jsontopdfconverter.herokuapp.com/getPdf',
@@ -662,7 +704,7 @@ class _BillingState extends State<Billing> {
                                               "sgst": (gstCharge / 2)
                                                   .toStringAsFixed(2),
                                               "date": date,
-                                              "total": grandtot+packing,
+                                              "total": grandtot + packing,
                                             },
                                           ),
                                         );
@@ -688,7 +730,7 @@ class _BillingState extends State<Billing> {
                                           "sgst": (gstCharge / 2)
                                               .toStringAsFixed(2),
                                           "date": DateTime.now(),
-                                          "total": grandtot+packing,
+                                          "total": grandtot + packing,
                                         });
                                         await Printing.layoutPdf(
                                             onLayout: (_) =>
