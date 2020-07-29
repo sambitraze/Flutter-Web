@@ -6,6 +6,7 @@ import 'package:slide_digital_clock/slide_digital_clock.dart';
 import 'package:http/http.dart' as http;
 import 'package:printing/printing.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
+import 'billItem.dart';
 
 final menuItemColRef = Firestore.instance.collection('MenuItems');
 final billColRef = Firestore.instance.collection('BillList');
@@ -17,6 +18,8 @@ class Billing extends StatefulWidget {
 
 class _BillingState extends State<Billing> {
   String type;
+  LocalKey k;
+  bool sel = false;
   bool loading = false;
   List<DropdownMenuItem> getItems = [];
   TextEditingController customer = TextEditingController();
@@ -33,6 +36,8 @@ class _BillingState extends State<Billing> {
   List amount = [];
   List<DataRow> rowList = [];
   int billno = 0;
+  List<BillItem> billitemlist = [];
+  List<BillItem> selectedbillitemlist = [];
 
   double itemsum = 0;
   double packing = 0;
@@ -120,6 +125,29 @@ class _BillingState extends State<Billing> {
         });
       },
     );
+  }
+
+  onselectedRow(bool selected,BillItem billitem)async{
+    setState(() {
+      if(selected){
+      selectedbillitemlist.add(billitem);
+    }
+    else{
+      selectedbillitemlist.remove(billitem);
+    }
+    });
+  }
+  deleteItems()async{
+    setState(() {
+      if(selectedbillitemlist.isNotEmpty){
+      List<BillItem> temp = [];
+      temp.addAll(selectedbillitemlist);
+      for(BillItem item in temp){
+        billitemlist.remove(item);
+        selectedbillitemlist.remove(item);
+      }
+    }
+    });
   }
 
   @override
@@ -242,8 +270,7 @@ class _BillingState extends State<Billing> {
                                       style: TextStyle(fontSize: 18),
                                     ),
                                     Container(
-                                      padding: EdgeInsets.all(10),
-                                      height: 65,
+                                      // height: 100,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(15),
                                         color: Colors.white,
@@ -254,7 +281,7 @@ class _BillingState extends State<Billing> {
                                         items: getItems,
                                         value: itemName,
                                         hint: 'Search',
-                                        searchHint: 'sea',
+                                        searchHint: 'search',
                                         onChanged: (value) {
                                           print(value);
                                           setState(() {
@@ -264,35 +291,6 @@ class _BillingState extends State<Billing> {
                                         isExpanded: true,
                                       ),
                                     ),
-                                    // Container(
-                                    //   height: 100,
-                                    //   width: 400,
-                                    //   alignment: Alignment.center,
-                                    //   child: TextFormField(
-                                    //     controller: itemName,
-                                    //     decoration: InputDecoration(
-                                    //       prefixIcon: Icon(Icons.search),
-                                    //       focusColor: Colors.white,
-                                    //       fillColor: Colors.white,
-                                    //       filled: true,
-                                    //       hintText: 'Search Item',
-                                    //       enabledBorder: OutlineInputBorder(
-                                    //         borderRadius:
-                                    //             BorderRadius.circular(15),
-                                    //         borderSide: BorderSide(
-                                    //             color: Colors.white,
-                                    //             width: 1.0),
-                                    //       ),
-                                    //       focusedBorder: OutlineInputBorder(
-                                    //         borderRadius:
-                                    //             BorderRadius.circular(15),
-                                    //         borderSide: BorderSide(
-                                    //             color: Colors.white,
-                                    //             width: 2.0),
-                                    //       ),
-                                    //     ),
-                                    //   ),
-                                    // ),
                                     Container(
                                       height: 100,
                                       width: 200,
@@ -338,6 +336,19 @@ class _BillingState extends State<Billing> {
                                                 0) {
                                               querySnapshot.documents.forEach(
                                                 (result) {
+                                                  billitemlist.add(BillItem(
+                                                      srlNo: srl,
+                                                      name: result
+                                                          .data['Item_Name'],
+                                                      price: int.parse(
+                                                          result.data['Price']),
+                                                      quantity: int.parse(
+                                                          quantity.text),
+                                                      amount: int.parse(
+                                                              quantity.text) *
+                                                          int.parse(result
+                                                              .data['Price'])));
+                                                  setState(() {});
                                                   srlno.add(srl);
                                                   itemList.add(
                                                       result.data['Item_Name']);
@@ -358,26 +369,38 @@ class _BillingState extends State<Billing> {
                                                           .toDouble(),
                                                       double.parse(
                                                           quantity.text));
-                                                  rowList.add(DataRow(cells: [
-                                                    DataCell(
-                                                        Text(srl.toString())),
-                                                    DataCell(Text(result
-                                                        .data['Item_Name'])),
-                                                    DataCell(Text(
-                                                        result.data['Price'])),
-                                                    DataCell(
-                                                        Text(quantity.text)),
-                                                    DataCell(Text((int.parse(
-                                                                quantity.text) *
-                                                            int.parse(result
-                                                                .data['Price']))
-                                                        .toString())),
-                                                  ]));
+                                                  rowList.add(
+                                                    DataRow(
+                                                      cells: [
+                                                        DataCell(Text(
+                                                            srl.toString())),
+                                                        DataCell(Text(
+                                                            result.data[
+                                                                'Item_Name'])),
+                                                        DataCell(Text(result
+                                                            .data['Price'])),
+                                                        DataCell(Text(
+                                                            quantity.text)),
+                                                        DataCell(
+                                                          Text(
+                                                            (int.parse(quantity
+                                                                        .text) *
+                                                                    int.parse(result
+                                                                            .data[
+                                                                        'Price']))
+                                                                .toString(),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
                                                 },
                                               );
-                                              setState(() {
-                                                srl++;
-                                              });
+                                              setState(
+                                                () {
+                                                  srl++;
+                                                },
+                                              );
                                             }
                                           },
                                         ).whenComplete(
@@ -470,7 +493,31 @@ class _BillingState extends State<Billing> {
                                               ),
                                             ),
                                           ],
-                                          rows: rowList,
+                                          // rows: rowList,
+                                          rows: billitemlist
+                                              .map(
+                                                (billitem) => DataRow(
+                                                  onSelectChanged: (selected){
+                                                    onselectedRow(selected, billitem);
+                                                  },
+                                                  selected: selectedbillitemlist.contains(billitem),
+                                                  cells: [
+                                                    DataCell(Text(billitem.srlNo
+                                                        .toString())),
+                                                    DataCell(Text(billitem.name
+                                                        .toString())),
+                                                    DataCell(Text(billitem.price
+                                                        .toString())),
+                                                    DataCell(Text(billitem
+                                                        .quantity
+                                                        .toString())),
+                                                    DataCell(Text(billitem
+                                                        .amount
+                                                        .toString())),
+                                                  ],
+                                                ),
+                                              )
+                                              .toList(),
                                         ),
                                       ),
                                     ),
@@ -554,6 +601,18 @@ class _BillingState extends State<Billing> {
                                       MainAxisAlignment.spaceEvenly,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
+                                    MaterialButton(
+                                      onPressed: () {deleteItems();},
+                                      child: Text(
+                                        'Delete Item',
+                                        style: TextStyle(fontSize: 22),
+                                      ),
+                                      color: Colors.orange,
+                                      padding: EdgeInsets.all(18),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                    ),
                                     Container(
                                       height: 100,
                                       width: 250,

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:slide_digital_clock/slide_digital_clock.dart';
 import 'package:uuid/uuid.dart';
@@ -17,6 +18,10 @@ class _ManageMenuState extends State<ManageMenu> {
   String type;
   String id;
   bool loading = false;
+
+  delitem(String idd){
+    Firestore.instance.collection('MenuItems').document(idd).delete();
+  }
 
   indlist(String type) {
     return Container(
@@ -44,8 +49,12 @@ class _ManageMenuState extends State<ManageMenu> {
                   final DocumentSnapshot document =
                       snapshot.data.documents[index];
                   return new ListTile(
-                    leading: Text(document.data['Item_Name'].toString()),
+                    title: Text(document.data['Item_Name'].toString()),
                     trailing: Text('Rs ' + document.data['Price'].toString()),
+                    leading: IconButton(icon: (Icon(Icons.cancel)), onPressed: (){
+                      print(document.documentID);
+                      delitem(document.documentID);
+                    }),
                   );
                 },
               );

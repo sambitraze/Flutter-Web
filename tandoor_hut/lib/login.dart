@@ -42,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
                     alignment: Alignment.topLeft,
                     child: InkWell(
                       onTap: (){
-                          Toast.show("Version 1.04", context, duration: Toast.LENGTH_SHORT, gravity:  Toast.BOTTOM);
+                          Toast.show("Version 1.05", context, duration: Toast.LENGTH_SHORT, gravity:  Toast.BOTTOM);
                       },
                       child: Text(
                         'Login',
@@ -90,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   Container(
-                    height: 100,
+                    height: 80,
                     width: 300,
                     alignment: Alignment.center,
                     child: TextFormField(
