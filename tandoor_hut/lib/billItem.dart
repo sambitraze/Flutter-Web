@@ -1,9 +1,11 @@
 class BillItem{
-  int srlNo;
+  // int srlNo;
   String name;
   int quantity;
   int price;
   int amount;
 
-  BillItem({this.srlNo,this.name,this.price,this.quantity,this.amount});
+  BillItem({
+    // this.srlNo,
+  this.name,this.price,this.quantity,this.amount});
 }

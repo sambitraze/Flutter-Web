@@ -45,9 +45,19 @@ class _BillingState extends State<Billing> {
   double gstCharge = 0.0;
   double grandtot = 0.0;
 
-  additemtotal(double val, double quanti) {
+  additemtotal() {
+    itemsum = 0;
+    gstCharge = 0.0;
+    grandtot = 0.0;
+    // setState(() {
+    //   itemsum += val;
+    //   gstCharge = itemsum * gstper * 0.01;
+    //   grandtot = gstCharge + itemsum;
+    // });
     setState(() {
-      itemsum += val;
+      billitemlist.forEach((element) {
+        itemsum += element.amount;
+      });
       gstCharge = itemsum * gstper * 0.01;
       grandtot = gstCharge + itemsum;
     });
@@ -68,7 +78,6 @@ class _BillingState extends State<Billing> {
       (value) {
         setState(() {
           billno = value.data['takeid'];
-          print('got1' + billno.toString());
         });
       },
     );
@@ -127,26 +136,26 @@ class _BillingState extends State<Billing> {
     );
   }
 
-  onselectedRow(bool selected,BillItem billitem)async{
+  onselectedRow(bool selected, BillItem billitem) async {
     setState(() {
-      if(selected){
-      selectedbillitemlist.add(billitem);
-    }
-    else{
-      selectedbillitemlist.remove(billitem);
-    }
+      if (selected) {
+        selectedbillitemlist.add(billitem);
+      } else {
+        selectedbillitemlist.remove(billitem);
+      }
     });
   }
-  deleteItems()async{
+
+  deleteItems() async {
     setState(() {
-      if(selectedbillitemlist.isNotEmpty){
-      List<BillItem> temp = [];
-      temp.addAll(selectedbillitemlist);
-      for(BillItem item in temp){
-        billitemlist.remove(item);
-        selectedbillitemlist.remove(item);
+      if (selectedbillitemlist.isNotEmpty) {
+        List<BillItem> temp = [];
+        temp.addAll(selectedbillitemlist);
+        for (BillItem item in temp) {
+          billitemlist.remove(item);
+          selectedbillitemlist.remove(item);
+        }
       }
-    }
     });
   }
 
@@ -276,19 +285,22 @@ class _BillingState extends State<Billing> {
                                         color: Colors.white,
                                       ),
                                       width: 400,
-                                      alignment: Alignment.center,
-                                      child: SearchableDropdown.single(
-                                        items: getItems,
-                                        value: itemName,
-                                        hint: 'Search',
-                                        searchHint: 'search',
-                                        onChanged: (value) {
-                                          print(value);
-                                          setState(() {
-                                            itemName.text = value;
-                                          });
-                                        },
-                                        isExpanded: true,
+                                      // alignment: Alignment.center,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: SearchableDropdown.single(
+                                          items: getItems,
+                                          value: itemName,
+                                          hint: 'Search',
+                                          searchHint: 'search',
+                                          onChanged: (value) {
+                                            print(value);
+                                            setState(() {
+                                              itemName.text = value;
+                                            });
+                                          },
+                                          isExpanded: true,
+                                        ),
                                       ),
                                     ),
                                     Container(
@@ -337,7 +349,6 @@ class _BillingState extends State<Billing> {
                                               querySnapshot.documents.forEach(
                                                 (result) {
                                                   billitemlist.add(BillItem(
-                                                      srlNo: srl,
                                                       name: result
                                                           .data['Item_Name'],
                                                       price: int.parse(
@@ -349,51 +360,7 @@ class _BillingState extends State<Billing> {
                                                           int.parse(result
                                                               .data['Price'])));
                                                   setState(() {});
-                                                  srlno.add(srl);
-                                                  itemList.add(
-                                                      result.data['Item_Name']);
-                                                  priceunit.add(
-                                                      result.data['Price']);
-                                                  quant.add(
-                                                      int.parse(quantity.text));
-                                                  amount.add((int.parse(
-                                                          quantity.text) *
-                                                      int.parse(result
-                                                          .data['Price'])));
-                                                  additemtotal(
-                                                      (int.parse(quantity
-                                                                  .text) *
-                                                              int.parse(
-                                                                  result.data[
-                                                                      'Price']))
-                                                          .toDouble(),
-                                                      double.parse(
-                                                          quantity.text));
-                                                  rowList.add(
-                                                    DataRow(
-                                                      cells: [
-                                                        DataCell(Text(
-                                                            srl.toString())),
-                                                        DataCell(Text(
-                                                            result.data[
-                                                                'Item_Name'])),
-                                                        DataCell(Text(result
-                                                            .data['Price'])),
-                                                        DataCell(Text(
-                                                            quantity.text)),
-                                                        DataCell(
-                                                          Text(
-                                                            (int.parse(quantity
-                                                                        .text) *
-                                                                    int.parse(result
-                                                                            .data[
-                                                                        'Price']))
-                                                                .toString(),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  );
+                                                  additemtotal();
                                                 },
                                               );
                                               setState(
@@ -451,15 +418,7 @@ class _BillingState extends State<Billing> {
                                       child: Container(
                                         color: Colors.white,
                                         child: DataTable(
-                                          columns: <DataColumn>[
-                                            DataColumn(
-                                              label: Text(
-                                                'Srl No',
-                                                style: TextStyle(
-                                                    fontStyle: FontStyle.italic,
-                                                    fontSize: 16),
-                                              ),
-                                            ),
+                                          columns: <DataColumn>[                                            
                                             DataColumn(
                                               label: Text(
                                                 'Item',
@@ -493,17 +452,18 @@ class _BillingState extends State<Billing> {
                                               ),
                                             ),
                                           ],
-                                          // rows: rowList,
                                           rows: billitemlist
                                               .map(
                                                 (billitem) => DataRow(
-                                                  onSelectChanged: (selected){
-                                                    onselectedRow(selected, billitem);
+                                                  onSelectChanged: (selected) {
+                                                    onselectedRow(
+                                                        selected, billitem);
                                                   },
-                                                  selected: selectedbillitemlist.contains(billitem),
+                                                  selected: selectedbillitemlist
+                                                      .contains(billitem),
                                                   cells: [
-                                                    DataCell(Text(billitem.srlNo
-                                                        .toString())),
+                                                    // DataCell(Text(billitem.srlNo
+                                                    //     .toString())),
                                                     DataCell(Text(billitem.name
                                                         .toString())),
                                                     DataCell(Text(billitem.price
@@ -602,7 +562,12 @@ class _BillingState extends State<Billing> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     MaterialButton(
-                                      onPressed: () {deleteItems();},
+                                      onPressed: selectedbillitemlist.isEmpty
+                                          ? null
+                                          : () {
+                                              deleteItems();
+                                              additemtotal();
+                                            },
                                       child: Text(
                                         'Delete Item',
                                         style: TextStyle(fontSize: 22),
@@ -730,6 +695,15 @@ class _BillingState extends State<Billing> {
                                                 ),
                                               )
                                             : Text('');
+                                        for (int i = 0;
+                                            i < billitemlist.length;
+                                            i++) {
+                                          srlno.add(i + 1);
+                                          itemList.add(billitemlist[i].name);
+                                          quant.add(billitemlist[i].quantity);
+                                          priceunit.add(billitemlist[i].price);
+                                          amount.add(billitemlist[i].amount);
+                                        }
 
                                         String date = DateFormat('dd-MM-yyy')
                                             .format(DateTime.now());

@@ -23,8 +23,8 @@ class MyApp extends StatelessWidget {
         logoSize: 150,
         duration: 2500,
         type: CustomSplashType.StaticDuration,
-        // home: LoginPage(),
-        home: HomePage(),
+        home: LoginPage(),
+        // home: HomePage(),
       ),
     );
   }
