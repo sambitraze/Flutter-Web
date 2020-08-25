@@ -42,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
                     alignment: Alignment.topLeft,
                     child: InkWell(
                       onTap: (){
-                          Toast.show("Version 1.05", context, duration: Toast.LENGTH_SHORT, gravity:  Toast.BOTTOM);
+                          Toast.show("Version 1.06", context, duration: Toast.LENGTH_SHORT, gravity:  Toast.BOTTOM);
                       },
                       child: Text(
                         'Login',
